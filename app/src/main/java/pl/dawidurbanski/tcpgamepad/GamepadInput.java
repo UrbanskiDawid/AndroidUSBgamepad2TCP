@@ -33,6 +33,9 @@ public class GamepadInput {
         THUMBR
     }
 
+    //true = down
+    public boolean KeysStatus[];
+
     //SUPPORTED AXIS
     public class GamepadAxis
     {
@@ -43,7 +46,7 @@ public class GamepadInput {
         public String toString()
         {
             return
-            String.format("%+.02f ", leftControleStickX)+ ","
+              String.format("%+.02f ", leftControleStickX)+ ","
             + String.format("%+.02f ", leftControleStickY)+ " "
             + " "
             + String.format("%+.02f ", rightControleStickX)+ ","
@@ -53,10 +56,11 @@ public class GamepadInput {
             + String.format("%+.02f ", dpadControleStickY)+ " ";
         }
     }
-    GamepadAxis gamepadAxis = new GamepadAxis();
+
+    public GamepadAxis gamepadAxis = new GamepadAxis();
 
     //map key code to GamepadKey
-    HashMap<Integer,GamepadKey> keysMap = new HashMap<Integer,GamepadKey>();
+    HashMap<Integer,GamepadKey> keysMap = new HashMap<>();
 
     public GamepadInput()
     {
@@ -72,17 +76,21 @@ public class GamepadInput {
         keysMap.put(KeyEvent.KEYCODE_BUTTON_R2, GamepadKey.R2);
         keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBL, GamepadKey.THUMBL);
         keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBR, GamepadKey.THUMBR);
+
+        KeysStatus = new boolean[GamepadKey.values().length];
+        for( int i=0; i<KeysStatus.length;i++)
+            KeysStatus[i]=false;
     }
 
-    interface KeyListener {  void onKey(GamepadKey key);    }
-    private List<KeyListener> keylisteners = new ArrayList<KeyListener>();
+    interface KeyListener {  void onKey(GamepadKey key,boolean down);    }
+    private List<KeyListener> keylisteners = new ArrayList<>();
     public void addOnKeyListener(KeyListener toAdd) { keylisteners.add(toAdd);    }
 
     interface AxisListener {  void onMove(GamepadAxis axis);    }
-    private List<AxisListener> axisListeners = new ArrayList<AxisListener>();
-    public void addOnMoveListener(AxisListener toAdd) {    axisListeners.add(toAdd);  }
+    private List<AxisListener> axisListeners = new ArrayList<>();
+    public void addOnAxisListener(AxisListener toAdd) {    axisListeners.add(toAdd);  }
 
-    public GamepadKey onKeyDown(int keyCode, KeyEvent event)
+    public GamepadKey onKey(int keyCode, KeyEvent event,boolean down)
     {
         if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) != InputDevice.SOURCE_GAMEPAD)
             return null;
@@ -95,10 +103,22 @@ public class GamepadInput {
             return null;
         }
 
+        KeysStatus[key.ordinal()]=down;// pressed released
+
         for (KeyListener kl : keylisteners)
-          kl.onKey(key);
+          kl.onKey(key,down);
 
         return key;
+    }
+
+    public boolean isKeyDown(GamepadKey key)
+    {
+        return KeysStatus[key.ordinal()];
+    }
+
+    public boolean isKeyUp(GamepadKey key)
+    {
+        return !KeysStatus[key.ordinal()];
     }
 
     private static float getCenteredAxis(MotionEvent event, InputDevice device, int axis, int historyPos) {
@@ -143,7 +163,7 @@ public class GamepadInput {
         return gamepadAxis;
     }
 
-    public boolean onGenericMotionEvent(MotionEvent event)  {
+    public GamepadAxis onGenericMotionEvent(MotionEvent event)  {
 
         // Check that the event came from a game controller
         if (   (event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
@@ -161,8 +181,8 @@ public class GamepadInput {
 
             // Process the current movement sample in the batch (position -1)
             processJoystickInput(event, -1);
-            return true;
+            return gamepadAxis;
         }
-        return false;
+        return null;
     }
 }

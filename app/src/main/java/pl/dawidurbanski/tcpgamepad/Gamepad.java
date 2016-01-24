@@ -8,15 +8,15 @@ import android.view.InputDevice;
 import java.util.ArrayList;
 
 /**
- * Created by dawid on 23.01.2016.
+ * Created by Dawid on 23.01.2016.
  */
 public class Gamepad {
 
-    ArrayList<InputDevice> devices = new ArrayList<InputDevice>();
+    private static ArrayList<InputDevice> devices = new ArrayList<>();
 
-    public ArrayList<InputDevice> getGameControllerIds()
+    public ArrayList<InputDevice> getGameControllers()
     {
-        devices = new ArrayList<InputDevice>();
+        devices = new ArrayList<>();
 
         for (int deviceId : InputDevice.getDeviceIds()) {
             InputDevice dev = InputDevice.getDevice(deviceId);

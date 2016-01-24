@@ -28,14 +28,13 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     Gamepad gamepad = new Gamepad();
-    GamepadInput gamepadInput = new GamepadInput();
-    Settings settings = new Settings();
+    static GamepadInput gamepadInput = new GamepadInput();
     TextView textView = null;
 
     FloatingActionButton fab;
 
     ListView listView = null;
-    ArrayList<String> listItems = new ArrayList<String>();
+    ArrayList<String> listItems = new ArrayList<>();
     ArrayAdapter<String> adapter;//DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
 
 
@@ -48,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         listView = (ListView) findViewById(R.id.listView);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItems);
         listView.setAdapter(adapter);
 
-        ArrayList<InputDevice> gamepads = gamepad.getGameControllerIds();
+        ArrayList<InputDevice> gamepads = gamepad.getGameControllers();
 
         if (!gamepads.isEmpty()) {
             String name = gamepads.get(0).getName();
@@ -78,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
 
         gamepadInput.addOnKeyListener(new GamepadInput.KeyListener() {
             @Override
-            public void onKey(GamepadInput.GamepadKey key) {
+            public void onKey(GamepadInput.GamepadKey key,boolean down) {
                 Log.i("dawid", "joy click" + key.toString());
                 Log2List("Clicked : " + key.toString());
             }
         });
 
-        gamepadInput.addOnMoveListener(new GamepadInput.AxisListener() {
+        gamepadInput.addOnAxisListener(new GamepadInput.AxisListener() {
             @Override
             public void onMove(GamepadInput.GamepadAxis axis) {
                 Log.i("dawid", "joy move" + axis.toString());
@@ -106,14 +105,25 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        GamepadInput.GamepadKey key = gamepadInput.onKeyDown(keyCode, event);
-        if (key != null) return true;
+        GamepadInput.GamepadKey key = gamepadInput.onKey(keyCode, event,true);
+        if (key != null)
+            return true;
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        GamepadInput.GamepadKey key = gamepadInput.onKey(keyCode, event, false);
+        if (key != null)
+            return true;
         return super.onKeyDown(keyCode, event);
     }
 
+
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        if (gamepadInput.onGenericMotionEvent(event)) return true;
+        GamepadInput.GamepadAxis ret =gamepadInput.onGenericMotionEvent(event);
+        if (ret!= null)
+            return true;
         return super.onGenericMotionEvent(event);
     }
 
@@ -133,9 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         switch (id) {
-            case R.id.action_connection:
-                Intent intent2 = new Intent(MainActivity.this, ConnectionSettingsActivity.class);
+            case R.id.action_tabs:
+                Intent intent2 = new Intent(MainActivity.this, Tabedctivity.class);
                 startActivity(intent2);
+                return true;
+            case R.id.action_connection:
+                Intent intent3 = new Intent(MainActivity.this, ConnectionSettingsActivity.class);
+                startActivity(intent3);
                 return true;
         }
 
@@ -148,14 +162,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
+    public void onStop()  { super.onStop();  }
 
     /**
      * asynchronous TCP connection
      */
-    private interface OnEvent { public void run();   }
+    private interface OnEvent { void run();   }
     public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
 
         TCPclient tcPclient = null;

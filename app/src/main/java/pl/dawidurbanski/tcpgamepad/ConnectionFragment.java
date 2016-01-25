@@ -190,8 +190,7 @@ public class ConnectionFragment extends Fragment {
         return (!TextUtils.isEmpty(email) && email.matches("^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$"));
     }
 
-    private boolean isPortValid(String port)
-    {
+    private boolean isPortValid(String port)  {
         return (!TextUtils.isEmpty(port) && port.matches("^[0-9]{1,8}$"));
     }
 

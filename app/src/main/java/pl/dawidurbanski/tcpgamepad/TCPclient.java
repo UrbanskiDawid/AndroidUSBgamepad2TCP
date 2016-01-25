@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -19,7 +20,7 @@ public class TCPclient {
     private String mADRESS_IP = "??";
     private int mADRESS_PORT = -1;
 
-    public int CONNECTION_CONNECT_TIMEOUT = 2000; //time to wait for connection
+    public int CONNECTION_CONNECT_TIMEOUT = 5000; //time to wait for connection
     public int CONNECTION_READ_TIMEOUT = 0;       //0-no timeout
 
     //Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
@@ -72,13 +73,32 @@ public class TCPclient {
         mBufferOut = null;
     }
 
+    public static boolean isPortOpen(final String ip, final int port, final int timeout) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), timeout);
+            socket.close();
+            return true;
+        }
+
+        catch(ConnectException ce){
+            ce.printStackTrace();
+            return false;
+        }
+
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     String errorMgs="";
     public boolean run(String adress,int port) {
 
         errorMgs = "";
 
         boolean ret = true;
-        mADRESS_IP = adress;
+        mADRESS_IP = adress.trim();
         mADRESS_PORT = port;
 
         mRun = true;
@@ -88,6 +108,7 @@ public class TCPclient {
         try {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(mADRESS_IP);
+
             if(!serverAddr.isReachable(1000))
             {
                 errorMgs+=mADRESS_IP+" is unreachable";
@@ -98,12 +119,13 @@ public class TCPclient {
             Log.i("TCPclient","connecting "+adress+":"+port+" (timeout:"+CONNECTION_CONNECT_TIMEOUT+")");
 
             try {
+                socket = new Socket();
                 socket.setSoTimeout(CONNECTION_READ_TIMEOUT);
                 socket.connect(new InetSocketAddress(mADRESS_IP, mADRESS_PORT), CONNECTION_CONNECT_TIMEOUT);
-            }catch (Exception e){
-                String errorStr ="cant connect: "+e.toString();
-                Log.w("TCPclient",errorStr );
-                errorMgs+=errorStr ;
+            } catch (Exception e) {
+                String errorStr = "Can't connect: " + e.toString();
+                Log.w("TCPclient", errorStr);
+                errorMgs += errorStr;
                 return false;
             }
 

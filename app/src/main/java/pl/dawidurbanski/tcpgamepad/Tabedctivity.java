@@ -123,8 +123,10 @@ public class Tabedctivity extends AppCompatActivity {
             Log2List("Move : " + axis.toString());
             //mConnectionFragment.sendMessage("axis:" + axis.toString() + "\n");
 
-            byte [] message = Message.generate(axis.dpadControleStickX, axis.dpadControleStickY, axis.rightControleStickY);
-            mConnectionFragment.sendMessage(message.toString());
+            //String message = Message.generate(axis.dpadControleStickX, axis.dpadControleStickY, axis.rightControleStickY).toString()
+            String message = Message.generateString(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickY);
+            Log.i(Tabedctivity.class.toString(),"send message: '"+message+"'");
+            mConnectionFragment.sendMessage(message);
             return true;
         }
         return super.onGenericMotionEvent(event);

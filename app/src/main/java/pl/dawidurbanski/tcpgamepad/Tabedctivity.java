@@ -125,7 +125,7 @@ public class Tabedctivity extends AppCompatActivity {
 
             //String message = Message.generate(axis.dpadControleStickX, axis.dpadControleStickY, axis.rightControleStickY).toString()
             String message = Message.generateString(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickY);
-            Log.i(Tabedctivity.class.toString(),"send message: '"+message+"'");
+            Log2List("Send: '"+message+"'");
             mConnectionFragment.sendMessage(message);
             return true;
         }

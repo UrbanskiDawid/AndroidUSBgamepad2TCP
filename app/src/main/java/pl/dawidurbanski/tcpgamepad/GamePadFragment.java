@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -25,7 +26,9 @@ import java.util.ArrayList;
  */
 public class GamePadFragment extends Fragment {
 
+
     private TextView mTextGamepadName;
+    View mPadView;
     private ProgressBar mProgressBarLX,mProgressBarLY;
     private ProgressBar mProgressBarRX,mProgressBarRY;
     private ProgressBar mProgressBarDX,mProgressBarDY;
@@ -59,39 +62,42 @@ public class GamePadFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView =inflater.inflate(R.layout.fragment_game_pad, container, false);
 
+        mPadView = rootView.findViewById(R.id.padView);
+
         mTextGamepadName=(TextView)rootView.findViewById(R.id.textGamepadName);
-        mProgressBarLX  =initProgressbar(rootView,R.id.progressBarLX);
-        mProgressBarLY  =initProgressbar(rootView,R.id.progressBarLY);
+        mProgressBarLX  = initProgressbar(rootView,R.id.progressBarLX);
+        mProgressBarLY  = initProgressbar(rootView,R.id.progressBarLY);
 
-        mProgressBarRX  =initProgressbar(rootView,R.id.progressBarRX);
-        mProgressBarRY  =initProgressbar(rootView,R.id.progressBarRY);
+        mProgressBarRX  = initProgressbar(rootView,R.id.progressBarRX);
+        mProgressBarRY  = initProgressbar(rootView,R.id.progressBarRY);
 
-        mProgressBarDX  =initProgressbar(rootView,R.id.progressBarDpadX);
-        mProgressBarDY  =initProgressbar(rootView,R.id.progressBarDpadY);
+        mProgressBarDX  = initProgressbar(rootView,R.id.progressBarDpadX);
+        mProgressBarDY  = initProgressbar(rootView,R.id.progressBarDpadY);
 
-        mTogleA = initTogleButton(rootView, R.id.toggleButtonA);
-        mTogleB = initTogleButton(rootView, R.id.toggleButtonB);
+        mTogleA = initToggleButton(rootView, R.id.toggleButtonA);
+        mTogleB = initToggleButton(rootView, R.id.toggleButtonB);
 
-        mTogleX = initTogleButton(rootView, R.id.toggleButtonX);
-        mTogleY = initTogleButton(rootView, R.id.toggleButtonY);
+        mTogleX = initToggleButton(rootView, R.id.toggleButtonX);
+        mTogleY = initToggleButton(rootView, R.id.toggleButtonY);
 
-        mTogleL1 = initTogleButton(rootView,R.id.toggleButtonL1);
-        mTogleL2 = initTogleButton(rootView,R.id.toggleButtonL2);
+        mTogleL1 = initToggleButton(rootView, R.id.toggleButtonL1);
+        mTogleL2 = initToggleButton(rootView, R.id.toggleButtonL2);
 
-        mTogleR1 = initTogleButton(rootView,R.id.toggleButtonR1);
-        mTogleR2 = initTogleButton(rootView,R.id.toggleButtonR2);
+        mTogleR1 = initToggleButton(rootView, R.id.toggleButtonR1);
+        mTogleR2 = initToggleButton(rootView, R.id.toggleButtonR2);
 
-        mTogleStart = initTogleButton(rootView,R.id.toggleButtonStart);
-        mTogleSelect = initTogleButton(rootView,R.id.toggleButtonSelect);
+        mTogleStart = initToggleButton(rootView, R.id.toggleButtonStart);
+        mTogleSelect = initToggleButton(rootView, R.id.toggleButtonSelect);
 
-        mTogleCL = initTogleButton(rootView,R.id.toggleButtonCl);
-        mTogleCR = initTogleButton(rootView,R.id.toggleButtonCR);
+        mTogleCL = initToggleButton(rootView, R.id.toggleButtonCl);
+        mTogleCR = initToggleButton(rootView, R.id.toggleButtonCR);
 
         updateGamepad();
 
         return rootView;
     }
-    private ToggleButton initTogleButton(View view,int id)
+
+    private ToggleButton initToggleButton(View view, int id)
     {
         ToggleButton ret=(ToggleButton)view.findViewById(id);
         ret.setFocusable(false);
@@ -101,7 +107,6 @@ public class GamePadFragment extends Fragment {
         ret.setTextOn(str);
         return ret;
     }
-
 
     private ProgressBar initProgressbar(View view,int id)
     {
@@ -116,7 +121,7 @@ public class GamePadFragment extends Fragment {
     private void updateProgressBarValue(ProgressBar pBar, float f)
     {
         float lCX = gamepadInput.gamepadAxis.leftControleStickX;
-        pBar.setProgress( 50+(int)(f*100.0f) );
+        pBar.setProgress(50 + (int) (f * 100.0f));
     }
 
     private void updateTogleButton(ToggleButton button, boolean on)
@@ -128,8 +133,10 @@ public class GamePadFragment extends Fragment {
     {
         ArrayList<InputDevice> gameControlers = gamepad.getGameControllers();
         if( gameControlers.size() == 0) {
+            mPadView.setVisibility(View.INVISIBLE);
             mTextGamepadName.setText("Gamepad: no gamepad connected!");
         }else {
+            mPadView.setVisibility(View.VISIBLE);
             mTextGamepadName.setText("Gamepad: " + gameControlers.get(0).getName());
         }
 

@@ -16,222 +16,241 @@
             android:text="New Text"
             android:id="@+id/textGamepadName" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Left Analog"
-                android:id="@+id/textL" />
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarLX" />
+                android:layout_height="match_parent"
+                android:id="@+id/padView">
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarLY" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Left Analog"
+                        android:id="@+id/textL" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarLX" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Right analog"
-                android:id="@+id/textR" />
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarLY" />
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarRX" />
+                </LinearLayout>
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarRY" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Right analog"
+                        android:id="@+id/textR" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarRX" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="dpad"
-                android:id="@+id/textDpad" />
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarRY" />
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarDpadX" />
+                </LinearLayout>
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarDpadY" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="dpad"
+                        android:id="@+id/textDpad" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarDpadX" />
 
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="A"
-                android:textOn="A"
-                android:textOff="A"
-                android:id="@+id/toggleButtonA"/>
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="B"
-                android:textOn="B"
-                android:textOff="B"
-                android:id="@+id/toggleButtonB"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonA"
-                android:layout_toEndOf="@+id/toggleButtonA" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="X"
-                android:textOn="X"
-                android:textOff="X"
-                android:id="@+id/toggleButtonX"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonB"
-                android:layout_toEndOf="@+id/toggleButtonB" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Y"
-                android:textOn="Y"
-                android:textOff="Y"
-                android:id="@+id/toggleButtonY"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonX"
-                android:layout_toEndOf="@+id/toggleButtonX" />
-        </RelativeLayout>
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressDrawable="@android:drawable/progress_horizontal"
+                        android:indeterminate="false"
+                        android:indeterminateOnly="false"
+                        android:id="@+id/progressBarDpadY" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                </LinearLayout>
 
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="L1"
-                android:textOn="L1"
-                android:textOff="L1"
-                android:id="@+id/toggleButtonL1"/>
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="L2"
-                android:textOn="L2"
-                android:textOff="L2"
-                android:id="@+id/toggleButtonL2"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonL1"
-                android:layout_toEndOf="@+id/toggleButtonL1" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R1"
-                android:textOn="R1"
-                android:textOff="R1"
-                android:id="@+id/toggleButtonR1"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonL2"
-                android:layout_toEndOf="@+id/toggleButtonL2" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R2"
-                android:textOn="R2"
-                android:textOff="R2"
-                android:id="@+id/toggleButtonR2"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonR1"
-                android:layout_toEndOf="@+id/toggleButtonR1" />
-        </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textOn="A"
+                        android:textOff="A"
+                        android:id="@+id/toggleButtonA"/>
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textOn="B"
+                        android:textOff="B"
+                        android:id="@+id/toggleButtonB"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonA"
+                        android:layout_toEndOf="@+id/toggleButtonA" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="X"
+                        android:textOn="X"
+                        android:textOff="X"
+                        android:id="@+id/toggleButtonX"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonB"
+                        android:layout_toEndOf="@+id/toggleButtonB" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Y"
+                        android:textOn="Y"
+                        android:textOff="Y"
+                        android:id="@+id/toggleButtonY"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonX"
+                        android:layout_toEndOf="@+id/toggleButtonX" />
+                </RelativeLayout>
 
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="select"
-                android:textOn="select"
-                android:textOff="select"
-                android:id="@+id/toggleButtonSelect"/>
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="start"
-                android:textOn="start"
-                android:textOff="start"
-                android:id="@+id/toggleButtonStart"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonSelect"
-                android:layout_toEndOf="@+id/toggleButtonSelect" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cl"
-                android:textOn="Cl"
-                android:textOff="Cl"
-                android:id="@+id/toggleButtonCl"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonStart"
-                android:layout_toEndOf="@+id/toggleButtonStart" />
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CR"
-                android:textOn="CR"
-                android:textOff="CR"
-                android:id="@+id/toggleButtonCR"
-                android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/toggleButtonCl"
-                android:layout_toEndOf="@+id/toggleButtonCl" />
-        </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-    </LinearLayout>
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="L1"
+                        android:textOn="L1"
+                        android:textOff="L1"
+                        android:id="@+id/toggleButtonL1"/>
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="L2"
+                        android:textOn="L2"
+                        android:textOff="L2"
+                        android:id="@+id/toggleButtonL2"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonL1"
+                        android:layout_toEndOf="@+id/toggleButtonL1" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R1"
+                        android:textOn="R1"
+                        android:textOff="R1"
+                        android:id="@+id/toggleButtonR1"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonL2"
+                        android:layout_toEndOf="@+id/toggleButtonL2" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R2"
+                        android:textOn="R2"
+                        android:textOff="R2"
+                        android:id="@+id/toggleButtonR2"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonR1"
+                        android:layout_toEndOf="@+id/toggleButtonR1" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="select"
+                        android:textOn="select"
+                        android:textOff="select"
+                        android:id="@+id/toggleButtonSelect"/>
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="start"
+                        android:textOn="start"
+                        android:textOff="start"
+                        android:id="@+id/toggleButtonStart"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonSelect"
+                        android:layout_toEndOf="@+id/toggleButtonSelect" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cl"
+                        android:textOn="Cl"
+                        android:textOff="Cl"
+                        android:id="@+id/toggleButtonCl"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonStart"
+                        android:layout_toEndOf="@+id/toggleButtonStart" />
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CR"
+                        android:textOn="CR"
+                        android:textOff="CR"
+                        android:id="@+id/toggleButtonCR"
+                        android:checked="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@+id/toggleButtonCl"
+                        android:layout_toEndOf="@+id/toggleButtonCl" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            </LinearLayout>
 
 </FrameLayout>

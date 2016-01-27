@@ -1,21 +1,18 @@
 package pl.dawidurbanski.tcpgamepad;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import android.app.ListFragment;
+import java.util.HashMap;
+import android.widget.SimpleAdapter;
 
 
 /**
@@ -35,8 +32,8 @@ public class LogsFragment extends Fragment {
 
     ListView listView = null;
     ArrayList<String> listItems = new ArrayList<>();
-    ArrayAdapter<String> adapter;//DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
-
+    SimpleAdapter adapter;//DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
+    ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
 
     /**
      * Use this factory method to create a new instance of
@@ -74,20 +71,20 @@ public class LogsFragment extends Fragment {
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                String fullLogMessage = sdf.format(new Date()) + ":" + str;
-
-                listItems.add(0,fullLogMessage);
+                String dateTime =sdf.format(new Date());
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put("from", dateTime);
+                map.put("to", str);
+                mylist.add(map);
 
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
-                    //listView.setSelection(adapter.getCount() - 1);
-                    Log.i("edawurb", "logging: " + fullLogMessage);
+                    Log.i("edawurb", "logging: " + dateTime+":"+str);
                 } else {
                     Log.e("edawurb", "logging: adapter is null");
                 }
             }
         });
-
     }
 
     @Override
@@ -99,9 +96,9 @@ public class LogsFragment extends Fragment {
         listView= (ListView)rootView.findViewById(R.id.logListView);
         if(listView==null) {   Log.e("edawurb","cant find list!");}
 
-        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, listItems);
+        adapter= new SimpleAdapter(rootView.getContext(), mylist, R.layout.row,
+                new String[] {"from", "to"}, new int[] {R.id.FROM_CELL, R.id.TO_CELL});
         listView.setAdapter(adapter);
-
         return rootView;
     }
 

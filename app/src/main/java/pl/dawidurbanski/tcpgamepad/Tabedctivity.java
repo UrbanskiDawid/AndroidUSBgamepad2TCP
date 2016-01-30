@@ -17,8 +17,8 @@ import android.view.View;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
-import pl.dawidurbanski.tcpgamepad.Gamepad.GamePadFragment;
-import pl.dawidurbanski.tcpgamepad.Gamepad.GamepadInput;
+import pl.dawidurbanski.tcpgamepad.GamePad.GamePadFragment;
+import pl.dawidurbanski.tcpgamepad.GamePad.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 
 public class Tabedctivity extends AppCompatActivity {
@@ -80,10 +80,9 @@ public class Tabedctivity extends AppCompatActivity {
         mSectionsPagerAdapter.mLogFragment.Log2List(str);
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        GamepadInput.GamepadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,true);
+        GamePadInput.GamePadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,true);
         if(key!=null)
         {
             Log2List("key down: " + key.toString());
@@ -94,7 +93,7 @@ public class Tabedctivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        GamepadInput.GamepadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,false);
+        GamePadInput.GamePadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,false);
         if(key!=null)
         {
             Log2List("key up:" + key.toString());
@@ -105,7 +104,7 @@ public class Tabedctivity extends AppCompatActivity {
 
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        GamepadInput.GamepadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
+        GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
             byte [] message = Message.generate(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);

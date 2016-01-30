@@ -59,7 +59,7 @@ public class ConnectionFragment extends Fragment{
 
         //address
         mAddressView = (AutoCompleteTextView) rootView.findViewById(R.id.adress);
-        mAddressView.setText(Settings.getInstance().adress);
+        mAddressView.setText(Settings.getInstance().address);
 
         //port
         mPortView = (EditText) rootView.findViewById(R.id.port);
@@ -102,7 +102,7 @@ public class ConnectionFragment extends Fragment{
     }
 
     public void connect() {
-        String address = Settings.getInstance().adress;
+        String address = Settings.getInstance().address;
         int port = Settings.getInstance().port;
 
         if (mAuthTask != null) {
@@ -158,7 +158,7 @@ public class ConnectionFragment extends Fragment{
             cancel = true;
         }
 
-        //adress
+        //address
         String adress = mAddressView.getText().toString();
         if (!isAddressValid(adress)) {
             mAddressView.setError(getString(R.string.error_invalid_adress));
@@ -180,7 +180,7 @@ public class ConnectionFragment extends Fragment{
         String port = mPortView.getText().toString();
 
         //ApplicationTest applicationTest = getApplicationContext();
-        Settings.getInstance().adress = adress;
+        Settings.getInstance().address = adress;
         Settings.getInstance().port   = Integer.parseInt(port);
 
         Settings.getInstance().save( getActivity().getApplicationContext() );

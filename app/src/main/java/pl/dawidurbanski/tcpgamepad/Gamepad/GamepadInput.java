@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad.Gamepad;
+package pl.dawidurbanski.tcpgamepad.GamePad;
 
 import android.util.Log;
 import android.view.InputDevice;
@@ -14,10 +14,10 @@ import java.util.List;
  *
  * http://developer.android.com/training/game-controllers/controller-input.html
  */
-public class GamepadInput {
+public class GamePadInput {
 
     //SUPPORTED KEYS
-    public enum GamepadKey
+    public enum GamePadKey
     {
         START,
         SELECT,
@@ -37,7 +37,7 @@ public class GamepadInput {
     public boolean KeysStatus[];
 
     //SUPPORTED AXIS
-    public class GamepadAxis
+    public class GamePadAxis
     {
         public float leftControleStickX=0f,  leftControleStickY=0f;
         public float rightControleStickX=0f, rightControleStickY=0f;
@@ -57,49 +57,49 @@ public class GamepadInput {
         }
     }
 
-    public GamepadAxis gamepadAxis = new GamepadAxis();
+    public GamePadAxis gamepadAxis = new GamePadAxis();
 
-    //map key code to GamepadKey
-    HashMap<Integer,GamepadKey> keysMap = new HashMap<>();
+    //map key code to GamePadKey
+    HashMap<Integer,GamePadKey> keysMap = new HashMap<>();
 
-    public GamepadInput()
+    public GamePadInput()
     {
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_START, GamepadKey.START);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_SELECT, GamepadKey.SELECT);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_X, GamepadKey.X);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_Y, GamepadKey.Y);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_A, GamepadKey.A);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_B, GamepadKey.B);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_L1, GamepadKey.L1);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_R1, GamepadKey.R1);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_L2, GamepadKey.L2);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_R2, GamepadKey.R2);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBL, GamepadKey.THUMBL);
-        keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBR, GamepadKey.THUMBR);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_START, GamePadKey.START);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_SELECT, GamePadKey.SELECT);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_X, GamePadKey.X);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_Y, GamePadKey.Y);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_A, GamePadKey.A);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_B, GamePadKey.B);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_L1, GamePadKey.L1);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_R1, GamePadKey.R1);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_L2, GamePadKey.L2);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_R2, GamePadKey.R2);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBL, GamePadKey.THUMBL);
+        keysMap.put(KeyEvent.KEYCODE_BUTTON_THUMBR, GamePadKey.THUMBR);
 
-        KeysStatus = new boolean[GamepadKey.values().length];
+        KeysStatus = new boolean[GamePadKey.values().length];
         for( int i=0; i<KeysStatus.length;i++)
             KeysStatus[i]=false;
     }
 
-    interface KeyListener {  void onKey(GamepadKey key,boolean down);    }
+    interface KeyListener {  void onKey(GamePadKey key,boolean down);    }
     private List<KeyListener> keylisteners = new ArrayList<>();
     public void addOnKeyListener(KeyListener toAdd) { keylisteners.add(toAdd);    }
 
-    interface AxisListener {  void onMove(GamepadAxis axis);    }
+    interface AxisListener {  void onMove(GamePadAxis axis);    }
     private List<AxisListener> axisListeners = new ArrayList<>();
     public void addOnAxisListener(AxisListener toAdd) {    axisListeners.add(toAdd);  }
 
-    public GamepadKey onKey(int keyCode, KeyEvent event,boolean down)
+    public GamePadKey onKey(int keyCode, KeyEvent event,boolean down)
     {
         if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) != InputDevice.SOURCE_GAMEPAD)
             return null;
         if (event.getRepeatCount() != 0)
             return null;
 
-        GamepadKey key = keysMap.get(keyCode);
+        GamePadKey key = keysMap.get(keyCode);
         if(key == null) {
-            Log.w("dawid","KEY <UNKNOWN>"+keyCode);
+            Log.w(GamePadInput.class.getName(),"KEY <UNKNOWN>"+keyCode);
             return null;
         }
 
@@ -111,12 +111,12 @@ public class GamepadInput {
         return key;
     }
 
-    public boolean isKeyDown(GamepadKey key)
+    public boolean isKeyDown(GamePadKey key)
     {
         return KeysStatus[key.ordinal()];
     }
 
-    public boolean isKeyUp(GamepadKey key)
+    public boolean isKeyUp(GamePadKey key)
     {
         return !KeysStatus[key.ordinal()];
     }
@@ -143,7 +143,7 @@ public class GamepadInput {
         }
         return 0;
     }
-    private GamepadAxis processJoystickInput(MotionEvent event,    int historyPos)
+    private GamePadAxis processJoystickInput(MotionEvent event,    int historyPos)
     {
         InputDevice mInputDevice = event.getDevice();
 
@@ -163,7 +163,7 @@ public class GamepadInput {
         return gamepadAxis;
     }
 
-    public GamepadAxis onGenericMotionEvent(MotionEvent event)  {
+    public GamePadAxis onGenericMotionEvent(MotionEvent event)  {
 
         // Check that the event came from a game controller
         if (   (event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK

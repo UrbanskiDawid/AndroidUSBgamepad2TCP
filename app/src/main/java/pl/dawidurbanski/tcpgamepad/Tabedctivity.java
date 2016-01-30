@@ -102,20 +102,32 @@ public class Tabedctivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    private void sentMessage(String name,float axis1,float axis2,float axis3,float axis4)
+    {
+        String axisStr = ""
+                + String.format("%+.01f ", axis1)+ ","
+                + String.format("%+.01f ", axis2)+ " "
+                + String.format("%+.01f ", axis3)+ ","
+                + String.format("%+.01f ", axis4)+ " ";
+
+        byte [] message = Message.generate(axis1, axis2, axis3, axis4);
+        String messageStr = Message.toStringAsInts(message).replace("|", "\n");
+
+        String isSendStr;
+        if(mSectionsPagerAdapter.mConnectionFragment.sendBytes(message))
+        {  isSendStr="yes";}
+        else
+        {  isSendStr="no";}
+
+        Log2List("Move : '"+name+"'" + axisStr + "\n" + messageStr + "\nsent: "+isSendStr);
+    }
+
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            byte [] message = Message.generate(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
-            String messageStr = Message.toStringAsInts(message).replace("|", "\n");
-            String isSendStr;
-            if(mSectionsPagerAdapter.mConnectionFragment.sendBytes(message))
-            {  isSendStr="yes";}
-            else
-            {  isSendStr="no";}
-
-            Log2List("Move : " + axis.toString() + "\n" + messageStr + "\nsent: "+isSendStr);
+            sentMessage("gampad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
             return true;
         }
         return super.onGenericMotionEvent(event);
@@ -132,16 +144,16 @@ public class Tabedctivity extends AppCompatActivity {
         public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
         public GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
 
-        private Pair<String,Fragment> mNamedFragments[];
+        private Pair<CharSequence,Fragment> mNamedFragments[];
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
 
             mNamedFragments = new Pair[]
-                    {       //TODO: use strings.xml
-                            Pair.create("logs",      mLogFragment ),
-                            Pair.create("gamepad",   mGamePadFragment),
-                            Pair.create("connection",mConnectionFragment)
+                    {
+                            Pair.create("log",        mLogFragment ),
+                            Pair.create("gamePad",    mGamePadFragment),
+                            Pair.create("connection", mConnectionFragment)
                     };
         }
 

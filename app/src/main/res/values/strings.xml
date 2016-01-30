@@ -14,4 +14,11 @@
     <string name="title_activity_tabedctivity">TCPgamepad</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fragmentLog_Title">logs</string>
+    <string name="fragmentGamePad_Title">gamePad</string>
+    <string name="fragmentConnection_Title">connection</string>
+    <string name="virtualGamepadStart">virtual gamepad</string>
+    <string name="title_activity_game_pad_virtual">GamePadVirtual</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

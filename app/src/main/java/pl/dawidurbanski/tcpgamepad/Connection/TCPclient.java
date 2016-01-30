@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.util.Log;
 

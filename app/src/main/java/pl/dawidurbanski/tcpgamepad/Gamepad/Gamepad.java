@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.Gamepad;
 
 import android.annotation.TargetApi;
 import android.os.Build;

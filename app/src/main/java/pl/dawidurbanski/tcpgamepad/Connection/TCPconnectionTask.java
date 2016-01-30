@@ -1,9 +1,7 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.os.AsyncTask;
 import android.util.Log;
-
-import java.io.StringReader;
 
 /**
  * Created by Dawid on 24.01.2016.

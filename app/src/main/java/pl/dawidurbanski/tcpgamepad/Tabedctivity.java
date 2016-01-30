@@ -10,24 +10,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
+import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
+import pl.dawidurbanski.tcpgamepad.Gamepad.GamePadFragment;
+import pl.dawidurbanski.tcpgamepad.Gamepad.GamepadInput;
+import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 
 public class Tabedctivity extends AppCompatActivity {
-
-    //Fragments
-    LogsFragment mLogFragment = LogsFragment.newInstance("logs");
-    ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
-    GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -38,11 +32,6 @@ public class Tabedctivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +47,14 @@ public class Tabedctivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
+        ViewPager mViewPager;
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        mConnectionFragment.onLog = new ConnectionFragment.OnEvent() {
+        mSectionsPagerAdapter.mConnectionFragment.onLog = new ConnectionFragment.OnEvent() {
             @Override
             public void run(String str) {
                 Log2List(str);
@@ -76,10 +66,10 @@ public class Tabedctivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            if(mConnectionFragment.isConnected()) {
-                mConnectionFragment.disconnect();
+            if(mSectionsPagerAdapter.mConnectionFragment.isConnected()) {
+                mSectionsPagerAdapter.mConnectionFragment.disconnect();
             }else{
-                mConnectionFragment.connect();
+                mSectionsPagerAdapter.mConnectionFragment.connect();
             }
             }
         });
@@ -87,13 +77,13 @@ public class Tabedctivity extends AppCompatActivity {
     }
 
     private void Log2List(String str) {
-        mLogFragment.Log2List(str);
+        mSectionsPagerAdapter.mLogFragment.Log2List(str);
     }
 
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        GamepadInput.GamepadKey key = mGamePadFragment.onKey(keyCode,event,true);
+        GamepadInput.GamepadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,true);
         if(key!=null)
         {
             Log2List("key down: " + key.toString());
@@ -104,7 +94,7 @@ public class Tabedctivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        GamepadInput.GamepadKey key = mGamePadFragment.onKey(keyCode,event,false);
+        GamepadInput.GamepadKey key = mSectionsPagerAdapter.mGamePadFragment.onKey(keyCode,event,false);
         if(key!=null)
         {
             Log2List("key up:" + key.toString());
@@ -115,13 +105,13 @@ public class Tabedctivity extends AppCompatActivity {
 
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        GamepadInput.GamepadAxis axis = mGamePadFragment.onGenericMotionEvent(event);
+        GamepadInput.GamepadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
             byte [] message = Message.generate(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
             String messageStr = Message.toStringAsInts(message).replace("|", "\n");
             String isSendStr;
-            if(mConnectionFragment.sendBytes(message))
+            if(mSectionsPagerAdapter.mConnectionFragment.sendBytes(message))
             {  isSendStr="yes";}
             else
             {  isSendStr="no";}
@@ -136,7 +126,12 @@ public class Tabedctivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        //Fragments
+        public LogsFragment mLogFragment = LogsFragment.newInstance("logs");
+        public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
+        public GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
 
         private Pair<String,Fragment> mNamedFragments[];
 

@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +13,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import pl.dawidurbanski.tcpgamepad.R;
+import pl.dawidurbanski.tcpgamepad.Settings;
 
 
 /**
@@ -92,7 +95,7 @@ public class ConnectionFragment extends Fragment{
         return  ( mAuthTask!=null && mAuthTask.isIsConnected());
     }
 
-    void disconnect() {
+    public void disconnect() {
         if(!isConnected()) return;
         Log("disconnecting!");
         mAuthTask.tcPclient.stop();

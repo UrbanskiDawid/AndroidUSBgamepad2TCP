@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.Gamepad;
 
 import android.util.Log;
 import android.view.InputDevice;
@@ -39,9 +39,9 @@ public class GamepadInput {
     //SUPPORTED AXIS
     public class GamepadAxis
     {
-        float leftControleStickX=0f,  leftControleStickY=0f;
-        float rightControleStickX=0f, rightControleStickY=0f;
-        float dpadControleStickX=0f,  dpadControleStickY=0f;
+        public float leftControleStickX=0f,  leftControleStickY=0f;
+        public float rightControleStickX=0f, rightControleStickY=0f;
+        public float dpadControleStickX=0f,  dpadControleStickY=0f;
 
         public String toString()
         {

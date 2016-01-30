@@ -51,12 +51,10 @@ public class Message {
         }
         crcShort &= 0xffff;
 
-        byte [] ret =new byte[] {
+        return new byte[] {
                 (byte) (crcShort & 0xff),
                 (byte) ((crcShort >> 8) & 0xff)
         };
-        Log.e("CRC", byteArrayAsInts(ret,0,2));
-        return ret;
     }
 
     /*
@@ -85,7 +83,7 @@ public class Message {
 
     static public String byteArrayAsInts(byte [] message,int from,int to)   {
         String ret = "";
-        for(int i=from;i<to;i++){  //for (byte b : message) {
+        for(int i=from;i<to;i++){
             int I = ((int) message[i] & 0xFF);
             ret += "" + String.format("%03d", I) + ",";
         }

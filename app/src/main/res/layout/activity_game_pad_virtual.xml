@@ -3,17 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
-    tools:context="pl.dawidurbanski.tcpgamepad.GamePad.GamePadVirtual">
+    tools:context=".VirtualGamePad.VirtualGamePadFragment">
 
     <LinearLayout android:orientation="vertical" android:layout_height="fill_parent" android:layout_width="fill_parent">
         <LinearLayout android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="fill_parent">
-            <pl.dawidurbanski.tcpgamepad.GamePad.GamePadVirtualKnobView
+            <pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadKnobView
                 android:id="@+id/fullscreen_contentL"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </LinearLayout>
         <LinearLayout android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="fill_parent">
-            <pl.dawidurbanski.tcpgamepad.GamePad.GamePadVirtualKnobView
+            <pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadKnobView
                 android:id="@+id/fullscreen_contentR"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

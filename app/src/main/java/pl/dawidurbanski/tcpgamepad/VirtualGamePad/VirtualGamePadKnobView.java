@@ -16,12 +16,6 @@ public class VirtualGamePadKnobView extends View {
 
     private Paint mPaint = new Paint();
 
-    public String mName="";
-
-    public float
-        xPos = 0.0f,
-        yPos = 0.0f;
-
     private Rect mRect = new Rect();
 
     private KnobPosition knobPos = new KnobPosition();
@@ -37,8 +31,7 @@ public class VirtualGamePadKnobView extends View {
     public void disableKnoxXReset()  { knobPos.resettableX=false; }
     public void disableKnobYReset()  { knobPos.resettableY=false; }
 
-    public void init(String name) {
-        mName=name;
+    public void init() {
 
         // Set up the user interaction to manually show or hide the system UI.
         setOnTouchListener(new View.OnTouchListener() {
@@ -53,15 +46,13 @@ public class VirtualGamePadKnobView extends View {
                         float x = 2.0f * (-0.5f + (event.getX() - mRect.left) / mRect.right);
                         float y = 2.0f * (-0.5f + (event.getY() + mRect.top) / mRect.bottom);
 
-                        knobPos.set(event.getX(), event.getY(), event.getSize());
-                        onAnalogMove(x, y);
-                        invalidate();
+                        knobPos.set(x, y, event.getSize());
+                        onNewPosition();
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        knobPos.reset(mRect.centerX(), mRect.centerY());
-                        onAnalogMove(0.0f, 0.0f);
-                        invalidate();
+                        knobPos.reset();
+                        onNewPosition();
                         break;
                 }
                 return true;
@@ -69,13 +60,18 @@ public class VirtualGamePadKnobView extends View {
         });
     }
 
+    private void onNewPosition()  {
+        invalidate();
+        if(onMove!=null) onMove.onMove(knobPos.xPos,knobPos.yPos);
+    }
+
     private class KnobPosition  {
         boolean mIsInitialized=false;
         boolean resettableX =true;
         boolean resettableY =true;
 
-        float xPos=0;
-        float yPos=0;
+        float xPos=0;//-1.0f - 0.0f +1.0f
+        float yPos=0;//-1.0f - 0.0f +1.0f
         float radius=0;
 
         public void KnobPosition(boolean x,boolean y) {
@@ -90,25 +86,30 @@ public class VirtualGamePadKnobView extends View {
             radius=size;
         }
 
-        public void reset(float x,float y) {
-            if(resettableX) xPos = x;
-            if(resettableY) yPos = y;
+        public void reset() {
+            if(resettableX) xPos = 0.0f;
+            if(resettableY) yPos = 0.0f;
         }
 
-        public void draw(Canvas canvas){
+        public void draw(Canvas canvas) {
             if(!mIsInitialized) return;
+
+            float w2 = canvas.getWidth()/2;
+            float h2 = canvas.getHeight()/2;
+
+            float centerX =w2+xPos*w2;
+            float centerY =h2+yPos*h2;
+
             for(int i=0;i<50;i+=10)
-            canvas.drawCircle(xPos,yPos,radius+i,mPaint);
+                canvas.drawCircle(
+                    centerX,
+                    centerY,
+                    radius+i,mPaint);
         }
     }
 
-    private void onAnalogMove(float x,float y) {
-
-        xPos = x;
-        yPos = y;
-
-        if(onMove!=null) onMove.onMove(xPos,yPos);
-    }
+    public float getXpos() {   return knobPos.xPos;   }
+    public float getYpos() {   return knobPos.yPos;   }
 
     public VirtualGamePadKnobView(Context context, AttributeSet attrs) {
         super(context, attrs);

@@ -46,14 +46,14 @@ public class GamepadInput {
         public String toString()
         {
             return
-              String.format("%+.02f ", leftControleStickX)+ ","
-            + String.format("%+.02f ", leftControleStickY)+ " "
+              String.format("%+.01f ", leftControleStickX)+ ","
+            + String.format("%+.01f ", leftControleStickY)+ " "
             + " "
-            + String.format("%+.02f ", rightControleStickX)+ ","
-            + String.format("%+.02f ", rightControleStickY)+ " "
+            + String.format("%+.01f ", rightControleStickX)+ ","
+            + String.format("%+.01f ", rightControleStickY)+ " "
             + " "
-            + String.format("%+.02f ", dpadControleStickX)+ ","
-            + String.format("%+.02f ", dpadControleStickY)+ " ";
+            + String.format("%+.01f ", dpadControleStickX)+ ","
+            + String.format("%+.01f ", dpadControleStickY)+ " ";
         }
     }
 

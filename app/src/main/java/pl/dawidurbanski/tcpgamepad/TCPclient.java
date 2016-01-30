@@ -3,11 +3,9 @@ package pl.dawidurbanski.tcpgamepad;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -29,14 +27,15 @@ public class TCPclient {
     private OnMessageReceived mMessageListener = null;
 
     public interface OnEvent { void run(); }
-    public OnEvent onConnected=null;
-
+    public OnEvent onConnected =null;
+    public OnEvent onDisconnected =null;
 
     // while this is true, the server will continue running
     private boolean mRun = false;
 
     // used to send messages
-    private PrintWriter mBufferOut;
+    //private PrintWriter mBufferOut;
+    private DataOutputStream mBufferOut;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
@@ -48,48 +47,36 @@ public class TCPclient {
     /**
      * Sends the message entered by client to the server
      *
-     * @param message text entered by client
+     * @param myByteArray bytes to send
      */
-    public void sendMessage(String message) {
-        if (mBufferOut != null && !mBufferOut.checkError()) {
-            mBufferOut.print(message);
-            mBufferOut.flush();
-        }
+    public void sendBytes(byte[] myByteArray) throws IOException {
+        int len  = myByteArray.length;
+
+        if(mBufferOut==null || len<=0)
+        { return;}
+
+        mBufferOut.write(myByteArray, 0, len);
     }
 
     /**
      * Close the connection and release the members
      */
-    public void stop() {
+    public void stop()  {
         Log.i(TCPclient.class.getName(), "stopClient");
         mRun = false;
 
-        if (mBufferOut != null) {
-            mBufferOut.flush();
-            mBufferOut.close();
+        try {
+            if (mBufferOut != null) {
+                mBufferOut.flush();
+                mBufferOut.close();
+            }
+        }catch (IOException e)
+        {
+            Log.i(TCPclient.class.getName(), "stop(): "+e.toString());
         }
 
         mMessageListener = null;
         mBufferOut = null;
-    }
-
-    public static boolean isPortOpen(final String ip, final int port, final int timeout) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), timeout);
-            socket.close();
-            return true;
-        }
-
-        catch(ConnectException ce){
-            ce.printStackTrace();
-            return false;
-        }
-
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
     }
 
     String errorMgs="";
@@ -104,7 +91,6 @@ public class TCPclient {
         mRun = true;
 
         Socket socket = new Socket();
-
         try {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(mADRESS_IP);
@@ -133,22 +119,19 @@ public class TCPclient {
             if(onConnected!=null)   onConnected.run();
 
             try {
-                //sends the message to the server
-                mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                mBufferOut = new DataOutputStream( socket.getOutputStream() );
 
-                //receives the message which the server sends back
-                // used to read messages from the server
+                //Read loop
                 BufferedReader mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                //in this while the client listens for the messages sent by the server
-                String ServerMessage;// message to send to the server
-                while (mRun) {
-                    ServerMessage = mBufferIn.readLine();
-                    if (ServerMessage != null && mMessageListener != null) {
-                        //call the method messageReceived from MyActivity class
-                        mMessageListener.messageReceived(ServerMessage);
-                    }
+                String receivedMessage;// message to send to the server
+                while (mRun)
+                {
+                    receivedMessage = mBufferIn.readLine();
+                    if (receivedMessage != null && mMessageListener != null)
+                    { mMessageListener.messageReceived(receivedMessage); }//call the method messageReceived from MyActivity class
                 }
+                //---
+
             } catch (Exception e) {
                 Log.e(TCPclient.class.getName(), e.toString());
                 errorMgs+=e.toString();
@@ -156,6 +139,7 @@ public class TCPclient {
             } finally {
                 stop();
                 socket.close();//the socket must be closed.
+                if(onDisconnected !=null)   onDisconnected.run();
             }
         } catch(java.net.ConnectException ce)  {
             Log.w(TCPclient.class.getName(), "cant connect " + ce.toString());
@@ -171,5 +155,4 @@ public class TCPclient {
         }catch (Exception e){ Log.e("TCPclient",e.toString());}
         return ret;
     }
-
 }

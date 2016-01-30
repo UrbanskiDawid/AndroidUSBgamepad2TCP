@@ -1,12 +1,9 @@
 package pl.dawidurbanski.tcpgamepad;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +22,7 @@ import android.widget.TextView;
  * Use the {@link ConnectionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ConnectionFragment extends Fragment {
+public class ConnectionFragment extends Fragment{
 
     // UI references.
     private AutoCompleteTextView mAddressView = null;
@@ -95,7 +92,7 @@ public class ConnectionFragment extends Fragment {
         return  ( mAuthTask!=null && mAuthTask.isIsConnected());
     }
 
-    public void disconnect() {
+    void disconnect() {
         if(!isConnected()) return;
         Log("disconnecting!");
         mAuthTask.tcPclient.stop();
@@ -134,9 +131,10 @@ public class ConnectionFragment extends Fragment {
         mAuthTask.execute((Void) null);
     }
 
-    public boolean sendMessage(String message) {
+    public boolean sendBytes(byte[] myByteArray) {
         if(!isConnected()) return false;
-        mAuthTask.tcPclient.sendMessage(message);
+        try {   mAuthTask.tcPclient.sendBytes(myByteArray);
+        }catch (Exception e){return false;}
         return true;
     }
 
@@ -159,7 +157,7 @@ public class ConnectionFragment extends Fragment {
 
         //adress
         String adress = mAddressView.getText().toString();
-        if (!isAdressValid(adress)) {
+        if (!isAddressValid(adress)) {
             mAddressView.setError(getString(R.string.error_invalid_adress));
             focusView = mAddressView;
             cancel = true;
@@ -174,8 +172,7 @@ public class ConnectionFragment extends Fragment {
         }
     }
 
-    private void onSaveData()
-    {
+    private void onSaveData()  {
         String adress = mAddressView.getText().toString();
         String port = mPortView.getText().toString();
 
@@ -186,7 +183,7 @@ public class ConnectionFragment extends Fragment {
         Settings.getInstance().save( getActivity().getApplicationContext() );
     }
 
-    private boolean isAdressValid(String email) {
+    private boolean isAddressValid(String email) {
         return (!TextUtils.isEmpty(email) && email.matches("^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$"));
     }
 

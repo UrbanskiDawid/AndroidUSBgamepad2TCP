@@ -97,7 +97,6 @@ public class Tabedctivity extends AppCompatActivity {
         if(key!=null)
         {
             Log2List("key down: " + key.toString());
-            mConnectionFragment.sendMessage("buttonDown:" + key.toString() + "\n");
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -109,7 +108,6 @@ public class Tabedctivity extends AppCompatActivity {
         if(key!=null)
         {
             Log2List("key up:" + key.toString());
-            mConnectionFragment.sendMessage("buttonUp:" + key.toString()+"\n");
             return true;
         }
         return super.onKeyUp(keyCode, event);
@@ -120,13 +118,15 @@ public class Tabedctivity extends AppCompatActivity {
         GamepadInput.GamepadAxis axis = mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            Log2List("Move : " + axis.toString());
-            //mConnectionFragment.sendMessage("axis:" + axis.toString() + "\n");
+            byte [] message = Message.generate(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
+            String messageStr = Message.toStringAsInts(message).replace("|", "\n");
+            String isSendStr;
+            if(mConnectionFragment.sendBytes(message))
+            {  isSendStr="yes";}
+            else
+            {  isSendStr="no";}
 
-            //String message = Message.generate(axis.dpadControleStickX, axis.dpadControleStickY, axis.rightControleStickY).toString()
-            String message = Message.generateString(axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickY);
-            Log2List("Send: '"+message+"'");
-            mConnectionFragment.sendMessage(message);
+            Log2List("Move : " + axis.toString() + "\n" + messageStr + "\nsent: "+isSendStr);
             return true;
         }
         return super.onGenericMotionEvent(event);

@@ -7,13 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import android.widget.SimpleAdapter;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,9 +29,9 @@ public class LogsFragment extends Fragment {
     private String mParam1;
 
     ListView listView = null;
-    ArrayList<String> listItems = new ArrayList<>();
-    SimpleAdapter adapter;//DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
-    ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
+
+    ArrayAdapter adapter;
+    ArrayList<String> mylist = new ArrayList<>();
 
     /**
      * Use this factory method to create a new instance of
@@ -72,16 +70,14 @@ public class LogsFragment extends Fragment {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 String dateTime =sdf.format(new Date());
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("from", dateTime);
-                map.put("to", str);
-                mylist.add(map);
+
+                mylist.add(0, dateTime + ": " + str);
 
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
-                    Log.i("edawurb", "logging: " + dateTime+":"+str);
+                    Log.i(LogsFragment.class.getName(), "logging: " + dateTime+":"+str);
                 } else {
-                    Log.e("edawurb", "logging: adapter is null");
+                    Log.e(LogsFragment.class.getName(), "logging: adapter is null");
                 }
             }
         });
@@ -94,10 +90,9 @@ public class LogsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_logs, container, false);
 
         listView= (ListView)rootView.findViewById(R.id.logListView);
-        if(listView==null) {   Log.e("edawurb","cant find list!");}
+        if(listView==null) {   Log.e(LogsFragment.class.getName(), "cant find list!");}
 
-        adapter= new SimpleAdapter(rootView.getContext(), mylist, R.layout.row,
-                new String[] {"from", "to"}, new int[] {R.id.FROM_CELL, R.id.TO_CELL});
+        adapter = new ArrayAdapter<String>(rootView.getContext(),  android.R.layout.simple_list_item_1, mylist);
         listView.setAdapter(adapter);
         return rootView;
     }

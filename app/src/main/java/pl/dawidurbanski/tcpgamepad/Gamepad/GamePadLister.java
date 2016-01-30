@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * Created by dawid on 30.01.2016.
  */
 public class GamePadLister {
+
     private static ArrayList<InputDevice> devices = new ArrayList<>();
 
     public ArrayList<InputDevice> getGameControllers()
@@ -27,7 +28,7 @@ public class GamePadLister {
             {
                 // This device is a game controller. Store its device ID.
                 devices.add(dev);
-                Log.w("dawid", "found gamepad: " + dev.getName());
+                Log.w(GamePadLister.class.getName(), "found gamePad: " + dev.getName());
             }
         }
         return devices;

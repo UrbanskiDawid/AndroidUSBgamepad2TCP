@@ -44,23 +44,27 @@ public class VirtualGamePadFragment extends Fragment {
         final View rootView =inflater.inflate(R.layout.activity_game_pad_virtual, container, false);
 
         mAnalogL = (VirtualGamePadKnobView)rootView.findViewById(R.id.fullscreen_contentL);
-        mAnalogL.init("left");
+        mAnalogL.init();
         mAnalogL.disableKnoxXReset();
         mAnalogL.onMove = new VirtualGamePadKnobView.OnEvent() {
             @Override
             public void onMove(float x, float y) {
                 if(onMove!=null)
-                    onMove.onMove(x,y, mAnalogR.xPos,mAnalogR.yPos);
+                    onMove.onMove(
+                        mAnalogL.getXpos(),mAnalogL.getYpos(),
+                        mAnalogR.getXpos(),mAnalogR.getYpos());
             }
         };
 
         mAnalogR = (VirtualGamePadKnobView)rootView.findViewById(R.id.fullscreen_contentR);
-        mAnalogR.init("right");
+        mAnalogR.init();
         mAnalogR.onMove = new VirtualGamePadKnobView.OnEvent() {
             @Override
             public void onMove(float x, float y) {
                 if(onMove!=null)
-                    onMove.onMove(mAnalogL.xPos,mAnalogL.xPos,x,y);
+                    onMove.onMove(
+                        mAnalogL.getXpos(),mAnalogL.getYpos(),
+                        mAnalogR.getXpos(),mAnalogR.getYpos());
             }
         };
 

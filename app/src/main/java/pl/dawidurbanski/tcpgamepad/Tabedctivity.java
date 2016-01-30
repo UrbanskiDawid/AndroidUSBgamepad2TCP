@@ -1,5 +1,6 @@
 package pl.dawidurbanski.tcpgamepad;
 
+import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -20,6 +23,7 @@ import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
 import pl.dawidurbanski.tcpgamepad.GamePad.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePad.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
+import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
 
 public class Tabedctivity extends AppCompatActivity {
 
@@ -33,6 +37,8 @@ public class Tabedctivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
+    private CustomViewPager mViewPager = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +48,28 @@ public class Tabedctivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        ViewPager mViewPager;
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager= (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                onViewPagerSelectPage(position);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                onViewPagerSelectPage(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -133,6 +153,18 @@ public class Tabedctivity extends AppCompatActivity {
         return super.onGenericMotionEvent(event);
     }
 
+    private int mSelectedPage = -1;
+
+    //called by ViewPager
+    private void onViewPagerSelectPage(int position)
+    {
+        if(position==mSelectedPage) return;
+        mSelectedPage=position;
+
+        if(position==3)  mViewPager.setPagingEnabled(false);
+        else             mViewPager.setPagingEnabled(true);
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -143,6 +175,7 @@ public class Tabedctivity extends AppCompatActivity {
         public LogsFragment mLogFragment = LogsFragment.newInstance("logs");
         public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
         public GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
+        public VirtualGamePadFragment mVirtualGamePad = new VirtualGamePadFragment();
 
         private Pair<CharSequence,Fragment> mNamedFragments[];
 
@@ -153,8 +186,16 @@ public class Tabedctivity extends AppCompatActivity {
                     {
                             Pair.create("log",        mLogFragment ),
                             Pair.create("gamePad",    mGamePadFragment),
-                            Pair.create("connection", mConnectionFragment)
+                            Pair.create("connection", mConnectionFragment),
+                            Pair.create("virtualGamePad",mVirtualGamePad)
                     };
+
+            mVirtualGamePad.onMove = new VirtualGamePadFragment.OnEvent() {
+                @Override
+                public void onMove(float x, float y, float a, float b) {
+                    sentMessage("virtual",x,y,a,b);
+                }
+            };
         }
 
         @Override

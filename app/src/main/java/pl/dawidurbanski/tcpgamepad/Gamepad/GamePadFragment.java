@@ -23,10 +23,10 @@ import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * to handle interaction events.
- * Use the {@link GamepadFragment#newInstance} factory method to
+ * Use the {@link GamePadFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GamepadFragment extends Fragment {
+public class GamePadFragment extends Fragment  {
 
     private TextView mTextGamePadName;
     View mPadView;
@@ -47,10 +47,10 @@ public class GamepadFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment GamepadFragment.
+     * @return A new instance of fragment GamePadFragment.
      */
-    public static GamepadFragment newInstance() {
-        return new GamepadFragment();
+    public static GamePadFragment newInstance() {
+        return new GamePadFragment();
     }
 
     private void showVirtualGamePad(Context context)

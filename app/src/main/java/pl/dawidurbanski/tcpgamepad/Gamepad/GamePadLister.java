@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by dawid on 30.01.2016.
  */
-public class GamePadLister {
+public class GamePadLister  {
 
     private static ArrayList<InputDevice> devices = new ArrayList<>();
 

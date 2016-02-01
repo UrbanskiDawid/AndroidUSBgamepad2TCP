@@ -16,7 +16,7 @@ import android.view.View;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
-import pl.dawidurbanski.tcpgamepad.GamePad.GamepadFragment;
+import pl.dawidurbanski.tcpgamepad.GamePad.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePad.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
@@ -170,7 +170,7 @@ public class Tabedctivity extends AppCompatActivity {
         //Fragments
         public LogsFragment mLogFragment = LogsFragment.newInstance();
         public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
-        public GamepadFragment mGamePadFragment = GamepadFragment.newInstance();
+        public GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
         public VirtualGamePadFragment mVirtualGamePad = new VirtualGamePadFragment();
 
         private Pair<CharSequence,Fragment> mNamedFragments[];

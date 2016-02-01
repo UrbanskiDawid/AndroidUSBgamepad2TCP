@@ -1,7 +1,8 @@
-package pl.dawidurbanski.tcpgamepad.GamePad;
+package pl.dawidurbanski.tcpgamepad.GamePadHandler;
 
 import android.util.Log;
 import android.view.InputDevice;
+
 import java.util.ArrayList;
 
 /**
@@ -25,8 +26,9 @@ public class GamePadLister {
                     ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
                     )
             {
-                devices.add(dev);// This device is a game controller. Store its device ID.
-                Log.w(GamepadLister.class.getName(), "found gamePad: " + dev.getName());
+                // This device is a game controller. Store its device ID.
+                devices.add(dev);
+                Log.w(GamePadLister.class.getName(), "found gamePad: " + dev.getName());
             }
         }
         return devices;

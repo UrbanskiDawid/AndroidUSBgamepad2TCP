@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad.GamePad;
+package pl.dawidurbanski.tcpgamepad.GamePadHandler;
 
 import android.util.Log;
 import android.view.InputDevice;
@@ -33,9 +33,11 @@ public class GamePadInput {
         THUMBR
     }
 
-    public boolean KeysStatus[];    //true = down
+    //true = down
+    public boolean KeysStatus[];
 
-    public class GamePadAxis    //SUPPORTED AXIS
+    //SUPPORTED AXIS
+    public class GamePadAxis
     {
         public float leftControleStickX=0f,  leftControleStickY=0f;
         public float rightControleStickX=0f, rightControleStickY=0f;
@@ -55,11 +57,12 @@ public class GamePadInput {
         }
     }
 
-    public GamePadAxis gamepadAxis = new GamePadAxis();
+    public GamePadAxis gamePadAxis = new GamePadAxis();
 
-    HashMap<Integer,GamePadKey> keysMap = new HashMap<>();//map key code to GamePadKey
+    //map key code to GamePadKey
+    HashMap<Integer,GamePadKey> keysMap = new HashMap<>();
 
-    public GamepadInput()
+    public GamePadInput()
     {
         keysMap.put(KeyEvent.KEYCODE_BUTTON_START, GamePadKey.START);
         keysMap.put(KeyEvent.KEYCODE_BUTTON_SELECT, GamePadKey.SELECT);
@@ -96,7 +99,7 @@ public class GamePadInput {
 
         GamePadKey key = keysMap.get(keyCode);
         if(key == null) {
-            Log.w(GamepadInput.class.getName(),"KEY <UNKNOWN>"+keyCode);
+            Log.w(GamePadInput.class.getName(),"KEY <UNKNOWN>"+keyCode);
             return null;
         }
 
@@ -145,19 +148,19 @@ public class GamePadInput {
         InputDevice mInputDevice = event.getDevice();
 
         // Update the ship object based on the new x and y values
-        gamepadAxis.leftControleStickX =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_X, historyPos);
-        gamepadAxis.leftControleStickY =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Y, historyPos);
+        gamePadAxis.leftControleStickX =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_X, historyPos);
+        gamePadAxis.leftControleStickY =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Y, historyPos);
 
-        gamepadAxis.rightControleStickX=getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Z, historyPos);
-        gamepadAxis.rightControleStickY=getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_RZ, historyPos);
+        gamePadAxis.rightControleStickX=getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Z, historyPos);
+        gamePadAxis.rightControleStickY=getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_RZ, historyPos);
 
-        gamepadAxis.dpadControleStickX =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_HAT_X, historyPos);
-        gamepadAxis.dpadControleStickY =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_HAT_Y, historyPos);
+        gamePadAxis.dpadControleStickX =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_HAT_X, historyPos);
+        gamePadAxis.dpadControleStickY =getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_HAT_Y, historyPos);
 
         for (AxisListener al : axisListeners)
-            al.onMove(gamepadAxis);
+            al.onMove(gamePadAxis);
 
-        return gamepadAxis;
+        return gamePadAxis;
     }
 
     public GamePadAxis onGenericMotionEvent(MotionEvent event)  {
@@ -178,7 +181,7 @@ public class GamePadInput {
 
             // Process the current movement sample in the batch (position -1)
             processJoystickInput(event, -1);
-            return gamepadAxis;
+            return gamePadAxis;
         }
         return null;
     }

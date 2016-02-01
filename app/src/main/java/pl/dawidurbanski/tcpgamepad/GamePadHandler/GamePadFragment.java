@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad.GamePad;
+package pl.dawidurbanski.tcpgamepad.GamePadHandler;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,11 +10,14 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
 import java.util.ArrayList;
+
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
 
@@ -26,7 +29,7 @@ import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
  * Use the {@link GamePadFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GamePadFragment extends Fragment  {
+public class GamePadFragment extends Fragment {
 
     private TextView mTextGamePadName;
     View mPadView;
@@ -39,8 +42,8 @@ public class GamePadFragment extends Fragment  {
     private ToggleButton mTogleL1,mTogleL2,mTogleR1,mTogleR2;
     private ToggleButton mTogleStart,mTogleSelect,mTogleCL,mTogleCR;
 
-    private static GamepadLister gamepad = new GamepadLister();
-    private GamepadInput gamepadInput = new GamepadInput();
+    private static GamePadLister gamepad = new GamePadLister();
+    private GamePadInput gamePadInput = new GamePadInput();
 
     private Button mShowVirtualGamePadButton;
     /**
@@ -49,9 +52,16 @@ public class GamePadFragment extends Fragment  {
      *
      * @return A new instance of fragment GamePadFragment.
      */
+    // TODO: Rename and change types and number of parameters
     public static GamePadFragment newInstance() {
         return new GamePadFragment();
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
 
     private void showVirtualGamePad(Context context)
     {
@@ -149,35 +159,45 @@ public class GamePadFragment extends Fragment  {
             mTextGamePadName.setText("GamePadList: " + gameControlers.get(0).getName());
         }
 
-        updateProgressBarValue(mProgressBarLX, gamepadInput.gamepadAxis.leftControleStickX);
-        updateProgressBarValue(mProgressBarLY, gamepadInput.gamepadAxis.leftControleStickY);
-        updateProgressBarValue(mProgressBarRX, gamepadInput.gamepadAxis.rightControleStickX);
-        updateProgressBarValue(mProgressBarRY, gamepadInput.gamepadAxis.rightControleStickY);
-        updateProgressBarValue(mProgressBarDX, gamepadInput.gamepadAxis.dpadControleStickX);
-        updateProgressBarValue(mProgressBarDY, gamepadInput.gamepadAxis.dpadControleStickY);
+        updateProgressBarValue(mProgressBarLX, gamePadInput.gamePadAxis.leftControleStickX);
+        updateProgressBarValue(mProgressBarLY, gamePadInput.gamePadAxis.leftControleStickY);
+        updateProgressBarValue(mProgressBarRX, gamePadInput.gamePadAxis.rightControleStickX);
+        updateProgressBarValue(mProgressBarRY, gamePadInput.gamePadAxis.rightControleStickY);
+        updateProgressBarValue(mProgressBarDX, gamePadInput.gamePadAxis.dpadControleStickX);
+        updateProgressBarValue(mProgressBarDY, gamePadInput.gamePadAxis.dpadControleStickY);
 
-        updateToggleButton(mTogleA, gamepadInput.isKeyDown(GamepadInput.GamePadKey.A));
-        updateToggleButton(mTogleB, gamepadInput.isKeyDown(GamepadInput.GamePadKey.B));
-        updateToggleButton(mTogleX, gamepadInput.isKeyDown(GamepadInput.GamePadKey.X));
-        updateToggleButton(mTogleY, gamepadInput.isKeyDown(GamepadInput.GamePadKey.Y));
-        updateToggleButton(mTogleL1, gamepadInput.isKeyDown(GamepadInput.GamePadKey.L1));
-        updateToggleButton(mTogleL2, gamepadInput.isKeyDown(GamepadInput.GamePadKey.L2));
-        updateToggleButton(mTogleR1, gamepadInput.isKeyDown(GamepadInput.GamePadKey.R1));
-        updateToggleButton(mTogleR2, gamepadInput.isKeyDown(GamepadInput.GamePadKey.R2));
-        updateToggleButton(mTogleStart, gamepadInput.isKeyDown(GamepadInput.GamePadKey.START));
-        updateToggleButton(mTogleSelect, gamepadInput.isKeyDown(GamepadInput.GamePadKey.SELECT));
-        updateToggleButton(mTogleCL, gamepadInput.isKeyDown(GamepadInput.GamePadKey.THUMBL));
-        updateToggleButton(mTogleCR, gamepadInput.isKeyDown(GamepadInput.GamePadKey.THUMBR));
+        updateToggleButton(mTogleA, gamePadInput.isKeyDown(GamePadInput.GamePadKey.A));
+        updateToggleButton(mTogleB, gamePadInput.isKeyDown(GamePadInput.GamePadKey.B));
+        updateToggleButton(mTogleX, gamePadInput.isKeyDown(GamePadInput.GamePadKey.X));
+        updateToggleButton(mTogleY, gamePadInput.isKeyDown(GamePadInput.GamePadKey.Y));
+        updateToggleButton(mTogleL1, gamePadInput.isKeyDown(GamePadInput.GamePadKey.L1));
+        updateToggleButton(mTogleL2, gamePadInput.isKeyDown(GamePadInput.GamePadKey.L2));
+        updateToggleButton(mTogleR1, gamePadInput.isKeyDown(GamePadInput.GamePadKey.R1));
+        updateToggleButton(mTogleR2, gamePadInput.isKeyDown(GamePadInput.GamePadKey.R2));
+        updateToggleButton(mTogleStart, gamePadInput.isKeyDown(GamePadInput.GamePadKey.START));
+        updateToggleButton(mTogleSelect, gamePadInput.isKeyDown(GamePadInput.GamePadKey.SELECT));
+        updateToggleButton(mTogleCL, gamePadInput.isKeyDown(GamePadInput.GamePadKey.THUMBL));
+        updateToggleButton(mTogleCR, gamePadInput.isKeyDown(GamePadInput.GamePadKey.THUMBR));
     }
 
-    public GamepadInput.GamePadAxis onGenericMotionEvent(MotionEvent event) {
-        GamepadInput.GamePadAxis ret = gamepadInput.onGenericMotionEvent(event);
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    public GamePadInput.GamePadAxis onGenericMotionEvent(MotionEvent event) {
+        GamePadInput.GamePadAxis ret = gamePadInput.onGenericMotionEvent(event);
         if (ret!= null) updateGamePad();
         return ret;
     }
 
-    public GamepadInput.GamePadKey onKey(int keyCode, KeyEvent event,boolean down) {
-        GamepadInput.GamePadKey ret = gamepadInput.onKey(keyCode, event, down);
+    public GamePadInput.GamePadKey onKey(int keyCode, KeyEvent event,boolean down) {
+        GamePadInput.GamePadKey ret = gamePadInput.onKey(keyCode, event, down);
         if (ret != null) updateGamePad();
         return ret;
     }

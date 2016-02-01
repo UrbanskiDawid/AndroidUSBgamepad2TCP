@@ -34,10 +34,7 @@ public class VirtualGamePadFragment extends Fragment {
         mAnalogL.onMove = new VirtualGamePadKnobView.OnEvent() {
             @Override
             public void onMove(float x, float y) {
-                if(onMove!=null)
-                    onMove.onMove(
-                        mAnalogL.getXpos(),mAnalogL.getYpos(),
-                        mAnalogR.getXpos(),mAnalogR.getYpos());
+                move();
             }
         };
 
@@ -45,14 +42,19 @@ public class VirtualGamePadFragment extends Fragment {
         mAnalogR.init();
         mAnalogR.onMove = new VirtualGamePadKnobView.OnEvent() {
             @Override
-            public void onMove(float x, float y) {
-                if(onMove!=null)
-                    onMove.onMove(
-                        mAnalogL.getXpos(),mAnalogL.getYpos(),
-                        mAnalogR.getXpos(),mAnalogR.getYpos());
+            public void onMove(float x, float y) { move();
             }
         };
 
         return rootView;
+    }
+
+    private void move()
+    {
+        if(onMove==null) return;
+
+        onMove.onMove(
+                mAnalogL.getYpos(),mAnalogL.getXpos(),
+                mAnalogR.getYpos(),mAnalogR.getXpos());
     }
 }

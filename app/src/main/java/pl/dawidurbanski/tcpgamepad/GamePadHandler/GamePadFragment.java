@@ -76,14 +76,6 @@ public class GamePadFragment extends Fragment {
 
         mPadView = rootView.findViewById(R.id.padView);
 
-        mShowVirtualGamePadButton = (Button)rootView.findViewById(R.id.show_virtualGamepad);
-        mShowVirtualGamePadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showVirtualGamePad(v.getContext());
-            }
-        });
-
         mTextGamePadName =(TextView)rootView.findViewById(R.id.textGamepadName);
         mProgressBarLX  = initProgressbar(rootView,R.id.progressBarLX);
         mProgressBarLY  = initProgressbar(rootView,R.id.progressBarLY);

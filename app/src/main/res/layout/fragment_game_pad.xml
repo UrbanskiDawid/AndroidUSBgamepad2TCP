@@ -16,15 +16,6 @@
             android:text="New Text"
             android:id="@+id/textGamepadName" />
 
-        <Button
-            android:id="@+id/show_virtualGamepad"
-            style="?android:textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/virtualGamepadStart"
-            android:textStyle="bold" />
-
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"

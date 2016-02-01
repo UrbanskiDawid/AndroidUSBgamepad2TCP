@@ -52,7 +52,6 @@ public class GamePadFragment extends Fragment {
      *
      * @return A new instance of fragment GamePadFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static GamePadFragment newInstance() {
         return new GamePadFragment();
     }
@@ -62,9 +61,7 @@ public class GamePadFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-
-    private void showVirtualGamePad(Context context)
-    {
+    private void showVirtualGamePad(Context context) {
         Intent myIntent = new Intent(context, VirtualGamePadFragment.class);
         startActivity(myIntent);
     }
@@ -109,8 +106,7 @@ public class GamePadFragment extends Fragment {
         return rootView;
     }
 
-    private ToggleButton initToggleButton(View view, int id)
-    {
+    private ToggleButton initToggleButton(View view, int id) {
         ToggleButton ret=(ToggleButton)view.findViewById(id);
         ret.setFocusable(false);
         ret.setEnabled(false);
@@ -120,8 +116,7 @@ public class GamePadFragment extends Fragment {
         return ret;
     }
 
-    private ProgressBar initProgressbar(View view,int id)
-    {
+    private ProgressBar initProgressbar(View view,int id) {
         ProgressBar ret=(ProgressBar)view.findViewById(id);
         ret.setProgress(0);
         ret.setMax(100);
@@ -130,18 +125,15 @@ public class GamePadFragment extends Fragment {
     }
 
     // -1.0f - 0.0f - 1.0f convert to form 0 to 100 range
-    private void updateProgressBarValue(ProgressBar pBar, float f)
-    {
+    private void updateProgressBarValue(ProgressBar pBar, float f) {
         pBar.setProgress(50 + (int) (f * 100.0f));
     }
 
-    private void updateToggleButton(ToggleButton button, boolean on)
-    {
+    private void updateToggleButton(ToggleButton button, boolean on) {
         button.setChecked(on);
     }
 
-    private void updateGamePad()
-    {
+    private void updateGamePad() {
         ArrayList<InputDevice> gameControlers = gamepad.getGameControllers();
         if( gameControlers.size() == 0) {
             mPadView.setVisibility(View.INVISIBLE);
@@ -170,16 +162,6 @@ public class GamePadFragment extends Fragment {
         updateToggleButton(mTogleSelect, gamePadInput.isKeyDown(GamePadInput.GamePadKey.SELECT));
         updateToggleButton(mTogleCL, gamePadInput.isKeyDown(GamePadInput.GamePadKey.THUMBL));
         updateToggleButton(mTogleCR, gamePadInput.isKeyDown(GamePadInput.GamePadKey.THUMBR));
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     public GamePadInput.GamePadAxis onGenericMotionEvent(MotionEvent event) {

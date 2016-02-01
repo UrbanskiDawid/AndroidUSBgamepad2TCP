@@ -83,7 +83,8 @@ public class Message {
             ret.put(dummy);
         }
 
-        byte [] crc = calculateCRC16(ret.array(), 0, ret.array().length);
+        // CRC calculated only from payload data
+        byte [] crc = calculateCRC16(ret.array(), 4, 31);
         ret.put(crc);
 
        return ret.array();

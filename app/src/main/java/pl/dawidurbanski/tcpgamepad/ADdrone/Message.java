@@ -74,8 +74,7 @@ public class Message {
         ret.putShort(commandManual); // 16 - 17
         ret.put(solverModeStabilization); // 18
         // rest of packet is dummy
-        for (int i = 0; i < 32 - 18 - 1; i++)
-        {
+        for (int i = 0; i < 32 - 18 - 1; i++)    {
             ret.put(dummy);
         }
 

@@ -15,6 +15,10 @@ public class Message {
     */
     private static byte prefix  [] = {'$','$','$','$'};
 
+    private static byte dummy  = 0;
+    private static short commandManual = 1000;
+    private static byte solverModeStabilization = 10;
+
     /* not in use part
     Bin          Dec Hex
     1111 1111    255 FF
@@ -33,7 +37,7 @@ public class Message {
             (byte)255,(byte)255, (byte)255,(byte)255,(byte)255
     };
 
-    private static int messageLen = 32;
+    private static int messageLen = 38;
 
     //return 2bytes
     public static byte[] calculateCRC16(byte[] buff, int start, int end) {
@@ -57,18 +61,27 @@ public class Message {
      *BYTE:    0  1  2  3 |  4  5  6  7 |  8  9 10 11 | 12 13 14 15 | 16 17 18 19 | 20 21 | 22 23 | 24 25 | 26 27 | 28 29 | 30  31
      *VALUE:     prefix   |     axis1   |    axis2    |   axis3     |    axis4    |          not in use                   |   CRC
      */
-    static public byte [] generate(float axis1,float axis2,float axis3,float axis4) {
+    static public byte [] generate(float roll, float pitch, float yaw, float throttle) {
 
        ByteBuffer ret = ByteBuffer.allocate(messageLen);
        ret.order(ByteOrder.BIG_ENDIAN);
 
-       ret.put(prefix);        // 0- 3 - (8bytes)
-       ret.putFloat(axis1);    // 4- 7 - (4bytes)
-       ret.putFloat(axis2);    // 8-11 - (4bytes)
-       ret.putFloat(axis3);    //12-15 - (4bytes)
-       ret.putFloat(axis4);    //16-19 - (4bytes)
-       ret.put(notInUse);      //24-29 - (6bytes)
-       ret.put(calculateCRC16(ret.array(), 0, ret.array().length)); //29 - 23 CRC (3bytes)
+        ret.put(prefix);
+        ret.putFloat(roll);    // 0 - 3
+        ret.putFloat(pitch);    // 4 - 7
+        ret.putFloat(yaw);    // 8 - 11
+        ret.putFloat(throttle);    // 12 - 15
+        ret.putShort(commandManual); // 16 - 17
+        ret.put(solverModeStabilization); // 18
+        // rest of packet is dummy
+        for (int i = 0; i < 32 - 18 - 1; i++)
+        {
+            ret.put(dummy);
+        }
+
+        // CRC calculated only from payload data
+        byte [] crc = calculateCRC16(ret.array(), 4, 31);
+        ret.put(crc);
 
        return ret.array();
     }

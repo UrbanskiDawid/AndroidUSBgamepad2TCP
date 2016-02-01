@@ -10,14 +10,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
 import java.util.ArrayList;
-
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
 
@@ -26,10 +23,10 @@ import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * to handle interaction events.
- * Use the {@link GamePadFragment#newInstance} factory method to
+ * Use the {@link GamepadFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GamePadFragment extends Fragment {
+public class GamepadFragment extends Fragment {
 
     private TextView mTextGamePadName;
     View mPadView;
@@ -50,18 +47,11 @@ public class GamePadFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment GamePadFragment.
+     * @return A new instance of fragment GamepadFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static GamePadFragment newInstance() {
-        return new GamePadFragment();
+    public static GamepadFragment newInstance() {
+        return new GamepadFragment();
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
 
     private void showVirtualGamePad(Context context)
     {
@@ -178,16 +168,6 @@ public class GamePadFragment extends Fragment {
         updateToggleButton(mTogleSelect, gamepadInput.isKeyDown(GamePadInput.GamePadKey.SELECT));
         updateToggleButton(mTogleCL, gamepadInput.isKeyDown(GamePadInput.GamePadKey.THUMBL));
         updateToggleButton(mTogleCR, gamepadInput.isKeyDown(GamePadInput.GamePadKey.THUMBR));
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     public GamePadInput.GamePadAxis onGenericMotionEvent(MotionEvent event) {

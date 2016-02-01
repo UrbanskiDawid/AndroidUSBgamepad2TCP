@@ -33,11 +33,9 @@ public class GamePadInput {
         THUMBR
     }
 
-    //true = down
-    public boolean KeysStatus[];
+    public boolean KeysStatus[];    //true = down
 
-    //SUPPORTED AXIS
-    public class GamePadAxis
+    public class GamePadAxis    //SUPPORTED AXIS
     {
         public float leftControleStickX=0f,  leftControleStickY=0f;
         public float rightControleStickX=0f, rightControleStickY=0f;
@@ -59,8 +57,7 @@ public class GamePadInput {
 
     public GamePadAxis gamepadAxis = new GamePadAxis();
 
-    //map key code to GamePadKey
-    HashMap<Integer,GamePadKey> keysMap = new HashMap<>();
+    HashMap<Integer,GamePadKey> keysMap = new HashMap<>();//map key code to GamePadKey
 
     public GamePadInput()
     {

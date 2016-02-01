@@ -59,7 +59,7 @@ public class GamePadInput {
 
     HashMap<Integer,GamePadKey> keysMap = new HashMap<>();//map key code to GamePadKey
 
-    public GamePadInput()
+    public GamepadInput()
     {
         keysMap.put(KeyEvent.KEYCODE_BUTTON_START, GamePadKey.START);
         keysMap.put(KeyEvent.KEYCODE_BUTTON_SELECT, GamePadKey.SELECT);
@@ -96,7 +96,7 @@ public class GamePadInput {
 
         GamePadKey key = keysMap.get(keyCode);
         if(key == null) {
-            Log.w(GamePadInput.class.getName(),"KEY <UNKNOWN>"+keyCode);
+            Log.w(GamepadInput.class.getName(),"KEY <UNKNOWN>"+keyCode);
             return null;
         }
 

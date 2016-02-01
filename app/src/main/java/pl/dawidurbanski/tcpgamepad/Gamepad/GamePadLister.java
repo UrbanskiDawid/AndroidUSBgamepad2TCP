@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by dawid on 30.01.2016.
  */
-public class GamePadLister  {
+public class GamePadLister {
 
     private static ArrayList<InputDevice> devices = new ArrayList<>();
 
@@ -26,7 +26,7 @@ public class GamePadLister  {
                     )
             {
                 devices.add(dev);// This device is a game controller. Store its device ID.
-                Log.w(GamePadLister.class.getName(), "found gamePad: " + dev.getName());
+                Log.w(GamepadLister.class.getName(), "found gamePad: " + dev.getName());
             }
         }
         return devices;

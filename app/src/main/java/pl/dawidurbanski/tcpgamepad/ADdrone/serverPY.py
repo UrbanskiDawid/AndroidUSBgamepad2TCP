@@ -3,7 +3,6 @@ import sys
 from base64 import *
 import struct
 
-
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

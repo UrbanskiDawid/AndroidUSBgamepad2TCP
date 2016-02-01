@@ -8,7 +8,7 @@ import android.util.Log;
  */
 public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
 
-    public interface OnEvent { void run(String str);   }
+    public interface OnEvent { void run(String str); }
 
     TCPclient tcPclient = null;
 

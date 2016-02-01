@@ -21,6 +21,7 @@ public class CustomViewPager extends ViewPager {
         super(context);
         init();
     }
+
     public CustomViewPager(Context context, AttributeSet attrs)
     {
         super(context, attrs);

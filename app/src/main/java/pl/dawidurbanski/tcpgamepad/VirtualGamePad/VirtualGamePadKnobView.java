@@ -66,7 +66,6 @@ public class VirtualGamePadKnobView extends View {
     }
 
     private class KnobPosition  {
-        boolean mIsInitialized=false;
         boolean resettableX =true;
         boolean resettableY =true;
 
@@ -80,7 +79,6 @@ public class VirtualGamePadKnobView extends View {
         }
 
         public void set(float x,float y,float size) {
-            mIsInitialized =true;
             xPos=x;
             yPos=y;
             radius=size;
@@ -92,8 +90,6 @@ public class VirtualGamePadKnobView extends View {
         }
 
         public void draw(Canvas canvas) {
-            if(!mIsInitialized) return;
-
             float w2 = canvas.getWidth()/2;
             float h2 = canvas.getHeight()/2;
 

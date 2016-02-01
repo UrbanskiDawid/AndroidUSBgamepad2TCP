@@ -1,12 +1,8 @@
 package pl.dawidurbanski.tcpgamepad.ADdrone;
 
 import android.util.Base64;
-import android.util.Log;
-
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.zip.CRC32;
 
 /**
  * Created by Dawid on 24.01.2016.

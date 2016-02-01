@@ -17,7 +17,6 @@ import android.widget.TextView;
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.Settings;
 
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the

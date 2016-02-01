@@ -1,18 +1,14 @@
 package pl.dawidurbanski.tcpgamepad;
 
-import android.content.Context;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -20,7 +16,7 @@ import android.view.View;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
-import pl.dawidurbanski.tcpgamepad.GamePad.GamePadFragment;
+import pl.dawidurbanski.tcpgamepad.GamePad.GamepadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePad.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
@@ -172,9 +168,9 @@ public class Tabedctivity extends AppCompatActivity {
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         //Fragments
-        public LogsFragment mLogFragment = LogsFragment.newInstance("logs");
+        public LogsFragment mLogFragment = LogsFragment.newInstance();
         public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
-        public GamePadFragment mGamePadFragment = GamePadFragment.newInstance();
+        public GamepadFragment mGamePadFragment = GamepadFragment.newInstance();
         public VirtualGamePadFragment mVirtualGamePad = new VirtualGamePadFragment();
 
         private Pair<CharSequence,Fragment> mNamedFragments[];

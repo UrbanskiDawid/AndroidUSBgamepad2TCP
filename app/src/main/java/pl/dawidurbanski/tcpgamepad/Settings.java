@@ -22,7 +22,6 @@ public class Settings {
 
     private static String SETTINGS_ADDRESS_DEFAULT = "127.0.0.1";
     private static Integer SETTINGS_PORT_DEFAULT = 8080;
-
     private final String mSharedPreferencesName = "pl.dawidurbanski.tcpgamepad";
 
     public void save(Context context) {

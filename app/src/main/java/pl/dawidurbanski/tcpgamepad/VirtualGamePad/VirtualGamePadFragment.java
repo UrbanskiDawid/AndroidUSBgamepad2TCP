@@ -1,8 +1,8 @@
 package pl.dawidurbanski.tcpgamepad.VirtualGamePad;
 
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,27 +15,12 @@ import pl.dawidurbanski.tcpgamepad.R;
  */
 public class VirtualGamePadFragment extends Fragment {
 
-    VirtualGamePadKnobView
+    private VirtualGamePadKnobView
             mAnalogL,
             mAnalogR;
 
     public interface OnEvent { void onMove(float x,float y,float a,float b); }
     public OnEvent onMove=null;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

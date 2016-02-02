@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -143,7 +144,7 @@ public class Tabedctivity extends AppCompatActivity {
         GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            sentMessage("gampad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
+            sentMessage("gampad", axis.rightControleStickX, axis.rightControleStickY, axis.leftControleStickX, axis.leftControleStickY);
             return true;
         }
         return super.onGenericMotionEvent(event);
@@ -189,7 +190,9 @@ public class Tabedctivity extends AppCompatActivity {
             mVirtualGamePad.onMove = new VirtualGamePadFragment.OnEvent() {
                 @Override
                 public void onMove(float x, float y, float a, float b) {
-                    sentMessage("virtual",x,y,a,b);
+                    // throttle is value form 0 to 1
+                    float throttle = (b + 1.0f) / 2.0f;
+                    sentMessage("virtual",x,y,a,throttle);
                 }
             };
         }

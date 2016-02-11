@@ -14,6 +14,9 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadFragment;
@@ -90,6 +93,25 @@ public class Tabedctivity extends AppCompatActivity {
             }
         });
         //--
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() { tick(); }
+        }, 0, Settings.getInstance().messageRetransmissionRate);
+    }
+
+    /*
+     * this will run on messageRetransmissionRate
+     */
+    private void tick() {
+        if(message==null)
+            return;
+
+        mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
+        if(--messageNum==0) {
+            Log2List("Move: timeout");
+            message = null;
+        }
     }
 
     private void Log2List(String str) {
@@ -118,24 +140,20 @@ public class Tabedctivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    private int messageNum =0;
+    private byte [] message = null;//if null no data will be sent
     private void sentMessage(String name,float axis1,float axis2,float axis3,float axis4)
     {
+        messageNum = Settings.getInstance().messageRetransmissionNum;
+        message = Message.generate(axis1, axis2, axis3, axis4);
+        String messageStr = Message.toStringAsInts(message).replace("|", "\n");
+
         String axisStr = ""
                 + String.format("%+.01f ", axis1)+ ","
                 + String.format("%+.01f ", axis2)+ " "
                 + String.format("%+.01f ", axis3)+ ","
                 + String.format("%+.01f ", axis4)+ " ";
-
-        byte [] message = Message.generate(axis1, axis2, axis3, axis4);
-        String messageStr = Message.toStringAsInts(message).replace("|", "\n");
-
-        String isSendStr;
-        if(mSectionsPagerAdapter.mConnectionFragment.sendBytes(message))
-        {  isSendStr="yes";}
-        else
-        {  isSendStr="no";}
-
-        Log2List("Move : '"+name+"'" + axisStr + "\n" + messageStr + "\nsent: "+isSendStr);
+        Log2List("Move: '"+name+"'" + axisStr + " re-transmission"+Settings.getInstance().getMessageRetransmissionTime()+"sec \n" + messageStr);
     }
 
     @Override
@@ -143,7 +161,7 @@ public class Tabedctivity extends AppCompatActivity {
         GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            sentMessage("gampad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
+            sentMessage("gamePad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
             return true;
         }
         return super.onGenericMotionEvent(event);

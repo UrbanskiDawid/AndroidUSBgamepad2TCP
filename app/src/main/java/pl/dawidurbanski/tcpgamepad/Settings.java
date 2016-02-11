@@ -10,20 +10,45 @@ import android.widget.Toast;
  */
 public class Settings {
 
-    private static final Settings instance = new Settings();
-    public static Settings getInstance() {return instance;}
+    private Settings(){};
+
+    private static Settings instance = null;
+    public static Settings getInstance() {
+        if(instance==null) instance = new Settings();
+        return instance;
+    }
 
     private final String mSharedPreferencesName = "pl.dawidurbanski.tcpgamepad";
 
-    public String address ="";
-    public int port = -1;
+    public String address = SETTINGS_ADDRESS_DEFAULT;
+    public int port = SETTINGS_PORT_DEFAULT;
+    public int messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
+    public int messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
 
     private static String
        SETTINGS_ADDRESS = "address",
-       SETTINGS_PORT = "port";
+       SETTINGS_PORT = "port",
+       SETTINGS_MESSAGE_RETRANSMISSION_RATE = "msgRate",
+       SETTINGS_MESSAGE_RETRANSMISSION_NUM  = "msgNum";
 
     private static String SETTINGS_ADDRESS_DEFAULT = "127.0.0.1";
     private static Integer SETTINGS_PORT_DEFAULT = 8080;
+    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT = 50;//in MS (aka 20times per sec)
+    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT = 200;//number of repetition (10sec for rate=50)
+
+    /*
+     * delay between sending messages in seconds
+     */
+    public float getMessageRetransmissionTime() {
+        return messageRetransmissionRate * messageRetransmissionNum / 1000.0f;
+    }
+
+    /*
+     * how long to re-transmit message is seconds
+     */
+    public void setMessageRetransmissionTime(float sec) {
+        messageRetransmissionNum= Math.max(1,(int)Math.ceil(1000.0f * sec / messageRetransmissionRate ));
+    }
 
     public void save(Context context) {
         if(context==null) {
@@ -35,6 +60,8 @@ public class Settings {
         edit.clear();
         edit.putString(SETTINGS_ADDRESS, address.trim());
         edit.putInt(SETTINGS_PORT, port);
+        edit.putInt(SETTINGS_MESSAGE_RETRANSMISSION_RATE, messageRetransmissionRate);
+        edit.putInt(SETTINGS_MESSAGE_RETRANSMISSION_NUM, messageRetransmissionNum);
         edit.commit();
         Toast.makeText(context, "Settings are saved.",Toast.LENGTH_SHORT).show();
     }
@@ -44,13 +71,17 @@ public class Settings {
             Log.e(Settings.class.getName()+":"," load() !contest is null! )");
             return;
         }
-        SharedPreferences userDetails = context.getSharedPreferences(mSharedPreferencesName, Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(mSharedPreferencesName, Context.MODE_PRIVATE);
         try {
-            address = userDetails.getString(SETTINGS_ADDRESS, SETTINGS_ADDRESS_DEFAULT);
-            port = userDetails.getInt(SETTINGS_PORT, SETTINGS_PORT_DEFAULT);
+            address = sp.getString(SETTINGS_ADDRESS, SETTINGS_ADDRESS_DEFAULT);
+            port = sp.getInt(SETTINGS_PORT, SETTINGS_PORT_DEFAULT);
+            messageRetransmissionRate = sp.getInt(SETTINGS_MESSAGE_RETRANSMISSION_RATE, SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT);
+            messageRetransmissionNum = sp.getInt(SETTINGS_MESSAGE_RETRANSMISSION_NUM, SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT);
         }catch (Exception e){
             address = SETTINGS_ADDRESS_DEFAULT;
             port = SETTINGS_PORT_DEFAULT;
+            messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
+            messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
         }
         Toast.makeText(context, "Settings loaded.",Toast.LENGTH_SHORT).show();
     }

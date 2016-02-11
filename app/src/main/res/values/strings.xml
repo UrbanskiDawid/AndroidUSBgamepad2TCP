@@ -21,4 +21,22 @@
     <string name="title_activity_game_pad_virtual">GamePadVirtual</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="transmissionRate_prompt">rate (Hz)</string>
+    <string-array name="transmissionRate">
+        <item>1</item>
+        <item>2</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+
+    <string name="retransmissionSec_prompt">time (sec after input)</string>
+    <string-array name="retransmissionSec">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
 </resources>

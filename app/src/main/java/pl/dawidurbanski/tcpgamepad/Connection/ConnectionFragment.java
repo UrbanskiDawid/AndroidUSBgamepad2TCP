@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import pl.dawidurbanski.tcpgamepad.R;
@@ -29,6 +31,9 @@ public class ConnectionFragment extends Fragment{
     // UI references.
     private AutoCompleteTextView mAddressView = null;
     private EditText mPortView = null;
+    private Spinner
+            mTransmissionSec = null,
+            mRetransmissionRate = null;
 
     TCPconnectionTask mAuthTask = null;
 
@@ -73,6 +78,29 @@ public class ConnectionFragment extends Fragment{
             }
         });
         mPortView.setText("" + Settings.getInstance().port);
+
+
+        //messageRate
+        mRetransmissionRate = (Spinner) rootView.findViewById(R.id.transmissionRate);
+        ArrayAdapter<String> spinnerAdapter1
+                = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.transmissionRate));
+        mRetransmissionRate.setAdapter(spinnerAdapter1);
+
+        String s1 = ""+Math.round(Settings.getInstance().getMessageRate());
+        int spinnerPosition1 = spinnerAdapter1.getPosition( s1 );
+        mRetransmissionRate.setSelection(spinnerPosition1);
+
+
+        //messageSec
+        mTransmissionSec = (Spinner) rootView.findViewById(R.id.transmissionSec);
+        ArrayAdapter<String> spinnerAdapter2
+                = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.retransmissionSec));
+        mTransmissionSec.setAdapter(spinnerAdapter2);
+
+        String s2 = ""+Math.round(Settings.getInstance().getMessageRetransmissionTime());
+        int spinnerPosition2 = spinnerAdapter2.getPosition(s2);
+        mTransmissionSec.setSelection(spinnerPosition2);
+
 
         Button mEmailSignInButton = (Button) rootView.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -165,6 +193,16 @@ public class ConnectionFragment extends Fragment{
             cancel = true;
         }
 
+        if(! isInt(mRetransmissionRate.getSelectedItem().toString()) ) {
+            focusView = mRetransmissionRate;
+            cancel = true;
+        }
+
+        if(! isInt(mTransmissionSec.getSelectedItem().toString()) ) {
+            focusView = mTransmissionSec;
+            cancel = true;
+        }
+
         if (cancel) {
             Log("connection data in NOT valid");
             focusView.requestFocus();
@@ -175,13 +213,24 @@ public class ConnectionFragment extends Fragment{
     }
 
     private void onSaveData()  {
-        String adress = mAddressView.getText().toString();
-        String port = mPortView.getText().toString();
 
-        //ApplicationTest applicationTest = getApplicationContext();
-        Settings.getInstance().address = adress;
+        //address
+        String address = mAddressView.getText().toString();
+        Settings.getInstance().address = address;
+
+        //port
+        String port = mPortView.getText().toString();
         Settings.getInstance().port   = Integer.parseInt(port);
 
+        //RetransmissionRate
+        float hz = Float.parseFloat( mRetransmissionRate.getSelectedItem().toString() );
+        Settings.getInstance().setMessageRate(hz);
+
+        //mTransmissionSec
+        float transmissionSec = Float.parseFloat( mTransmissionSec.getSelectedItem().toString() );
+        Settings.getInstance().setMessageRetransmissionTime( transmissionSec );
+
+        //save
         Settings.getInstance().save( getActivity().getApplicationContext() );
     }
 
@@ -191,6 +240,15 @@ public class ConnectionFragment extends Fragment{
 
     private boolean isPortValid(String port)  {
         return (!TextUtils.isEmpty(port) && port.matches("^[0-9]{1,8}$"));
+    }
+    private boolean isInt(String s) {
+        try
+        {
+            Float.parseFloat(s);
+            return true;
+        }catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

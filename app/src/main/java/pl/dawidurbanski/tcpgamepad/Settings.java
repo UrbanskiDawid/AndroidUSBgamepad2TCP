@@ -37,6 +37,19 @@ public class Settings {
     private static Integer SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT = 200;//number of repetition (10sec for rate=50)
 
     /*
+     * message rate is stored as milliseconds between sending message
+     * min 20 milliseconds
+     */
+    public void setMessageRate(float hz) {
+        messageRetransmissionRate =  Math.max(20, (int)Math.ceil(1000.0f*1.0f/hz));
+        Log.e("MessageRate",":="+messageRetransmissionRate);
+    }
+
+    public float getMessageRate() {
+        return messageRetransmissionRate / 1000.0f * 1.0f;
+    }
+
+    /*
      * delay between sending messages in seconds
      */
     public float getMessageRetransmissionTime() {
@@ -45,9 +58,11 @@ public class Settings {
 
     /*
      * how long to re-transmit message is seconds
+     * minimum 1 second
      */
     public void setMessageRetransmissionTime(float sec) {
         messageRetransmissionNum= Math.max(1,(int)Math.ceil(1000.0f * sec / messageRetransmissionRate ));
+        Log.e("RetransmissionTime",":="+messageRetransmissionNum);
     }
 
     public void save(Context context) {

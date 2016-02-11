@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -207,7 +208,9 @@ public class Tabedctivity extends AppCompatActivity {
             mVirtualGamePad.onMove = new VirtualGamePadFragment.OnEvent() {
                 @Override
                 public void onMove(float x, float y, float a, float b) {
-                    sentMessage("virtual",x,y,a,b);
+                    // throttle is value form 0 to 1
+                    float throttle = (b + 1.0f) / 2.0f;
+                    sentMessage("virtual",x,y,a,throttle);
                 }
             };
         }

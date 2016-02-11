@@ -54,7 +54,7 @@ public class VirtualGamePadFragment extends Fragment {
         if(onMove==null) return;
 
         onMove.onMove(
-                mAnalogL.getYpos(),mAnalogL.getXpos(),
-                mAnalogR.getYpos(),mAnalogR.getXpos());
+                mAnalogR.getYpos(),mAnalogR.getXpos(),
+                mAnalogL.getYpos(),mAnalogL.getXpos());
     }
 }

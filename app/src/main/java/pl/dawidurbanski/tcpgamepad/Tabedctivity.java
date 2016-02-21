@@ -9,11 +9,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -95,9 +95,23 @@ public class Tabedctivity extends AppCompatActivity {
         });
         //--
 
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        restartTimmer();
+    }
+
+    Timer timer=null;
+
+    /*
+     * starts /restart Fixed event
+     */
+    public void restartTimmer() {
+        if (timer != null)
+            timer.cancel();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void run() { tick(); }
+            public void run() {
+                tick();
+            }
         }, 0, Settings.getInstance().messageRetransmissionRate);
     }
 
@@ -154,7 +168,7 @@ public class Tabedctivity extends AppCompatActivity {
                 + String.format("%+.01f ", axis2)+ " "
                 + String.format("%+.01f ", axis3)+ ","
                 + String.format("%+.01f ", axis4)+ " ";
-        Log2List("Move: '"+name+"'" + axisStr + " re-transmission"+Settings.getInstance().getMessageRetransmissionTime()+"sec \n" + messageStr);
+        Log2List("Move: '"+name+"'" + axisStr + " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec \n" + messageStr);
     }
 
     @Override
@@ -211,6 +225,13 @@ public class Tabedctivity extends AppCompatActivity {
                     // throttle is value form 0 to 1
                     float throttle = (b + 1.0f) / 2.0f;
                     sentMessage("virtual",x,y,a,throttle);
+                }
+            };
+
+            mConnectionFragment.onSave =new ConnectionFragment.OnEvent() {
+                @Override
+                public void run(String str) {
+                    restartTimmer();
                 }
             };
         }

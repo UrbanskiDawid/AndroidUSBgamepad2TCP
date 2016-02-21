@@ -12,18 +12,22 @@ public class Settings {
 
     private Settings(){};
 
-    private static Settings instance = null;
+    private static Settings instance = new Settings();
     public static Settings getInstance() {
-        if(instance==null) instance = new Settings();
         return instance;
     }
 
     private final String mSharedPreferencesName = "pl.dawidurbanski.tcpgamepad";
 
-    public String address = SETTINGS_ADDRESS_DEFAULT;
-    public int port = SETTINGS_PORT_DEFAULT;
-    public int messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
-    public int messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
+    private static String SETTINGS_ADDRESS_DEFAULT = "127.0.0.1";
+    private static Integer SETTINGS_PORT_DEFAULT = 8080;
+    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT = 50;//in MS (aka 20times per sec)
+    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT = 200;//number of repetition (10sec for rate=50)
+
+    public static String address = SETTINGS_ADDRESS_DEFAULT;
+    public static int port = SETTINGS_PORT_DEFAULT;
+    public static int messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
+    public static int messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
 
     private static String
        SETTINGS_ADDRESS = "address",
@@ -31,28 +35,27 @@ public class Settings {
        SETTINGS_MESSAGE_RETRANSMISSION_RATE = "msgRate",
        SETTINGS_MESSAGE_RETRANSMISSION_NUM  = "msgNum";
 
-    private static String SETTINGS_ADDRESS_DEFAULT = "127.0.0.1";
-    private static Integer SETTINGS_PORT_DEFAULT = 8080;
-    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT = 50;//in MS (aka 20times per sec)
-    private static Integer SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT = 200;//number of repetition (10sec for rate=50)
-
     /*
      * message rate is stored as milliseconds between sending message
      * min 20 milliseconds
      */
-    public void setMessageRate(float hz) {
-        messageRetransmissionRate =  Math.max(20, (int)Math.ceil(1000.0f*1.0f/hz));
-        Log.e("MessageRate",":="+messageRetransmissionRate);
+    public void setMessageRateInHz(float hz) {
+        messageRetransmissionRate = Math.max(20, (int)Math.ceil(1000.0f*1.0f/hz) );
+        Log.e("MessageRate","("+hz+"Hz) := "+messageRetransmissionRate+" mSec delay");
     }
 
-    public float getMessageRate() {
-        return messageRetransmissionRate / 1000.0f * 1.0f;
+    public float getMessageRateInHz() {
+        return 1000.0f / (float)messageRetransmissionRate;
+    }
+
+    public float getMessageRateInMillisSec() {
+        return (float)messageRetransmissionRate;
     }
 
     /*
      * delay between sending messages in seconds
      */
-    public float getMessageRetransmissionTime() {
+    public float getMessageRetransmissionTimeInSec() {
         return messageRetransmissionRate * messageRetransmissionNum / 1000.0f;
     }
 
@@ -60,9 +63,9 @@ public class Settings {
      * how long to re-transmit message is seconds
      * minimum 1 second
      */
-    public void setMessageRetransmissionTime(float sec) {
+    public void setMessageRetransmissionTimeInSec(float sec) {
         messageRetransmissionNum= Math.max(1,(int)Math.ceil(1000.0f * sec / messageRetransmissionRate ));
-        Log.e("RetransmissionTime",":="+messageRetransmissionNum);
+        Log.e("RetransmissionTime","("+sec+"sec) :="+messageRetransmissionNum + " number of retransmissions @"+ getMessageRateInHz()+"Hz");
     }
 
     public void save(Context context) {
@@ -98,6 +101,11 @@ public class Settings {
             messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
             messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
         }
+        Log.e("Settings","load() address="+address+";");
+        Log.e("Settings","load() port  ="+port+"; ");
+        Log.e("Settings","load() messageRetransmissionRate="+messageRetransmissionRate+" : "+ getMessageRateInHz()+"Hz; ");
+        Log.e("Settings","load() messageRetransmissionNum ="+messageRetransmissionNum+ " : "+ getMessageRetransmissionTimeInSec()+"sec;");
+
         Toast.makeText(context, "Settings loaded.",Toast.LENGTH_SHORT).show();
     }
 }

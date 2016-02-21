@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,8 @@ public class ConnectionFragment extends Fragment{
     TCPconnectionTask mAuthTask = null;
 
     public interface OnEvent { void run(String str);   }
-    public OnEvent onLog=null;
+    public OnEvent onLog=null,
+                   onSave=null;
 
     /**
      * Use this factory method to create a new instance of
@@ -86,10 +88,10 @@ public class ConnectionFragment extends Fragment{
                 = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.transmissionRate));
         mRetransmissionRate.setAdapter(spinnerAdapter1);
 
-        String s1 = ""+Math.round(Settings.getInstance().getMessageRate());
+        String s1 = ""+Math.round(Settings.getInstance().getMessageRateInHz());
         int spinnerPosition1 = spinnerAdapter1.getPosition( s1 );
         mRetransmissionRate.setSelection(spinnerPosition1);
-
+        Log.e("ConnectionFragment", "onCreateView() : messageRate='" + s1 +"' / '"+ Settings.getInstance().messageRetransmissionRate+ "' found at:" + spinnerPosition1);
 
         //messageSec
         mTransmissionSec = (Spinner) rootView.findViewById(R.id.transmissionSec);
@@ -97,9 +99,10 @@ public class ConnectionFragment extends Fragment{
                 = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.retransmissionSec));
         mTransmissionSec.setAdapter(spinnerAdapter2);
 
-        String s2 = ""+Math.round(Settings.getInstance().getMessageRetransmissionTime());
+        String s2 = ""+Math.round(Settings.getInstance().getMessageRetransmissionTimeInSec());
         int spinnerPosition2 = spinnerAdapter2.getPosition(s2);
         mTransmissionSec.setSelection(spinnerPosition2);
+        Log.e("ConnectionFragment", "onCreateView() : messageSec='" + s2 + "' / '"+Settings.getInstance().messageRetransmissionNum+"' found at:" + spinnerPosition2);
 
 
         Button mEmailSignInButton = (Button) rootView.findViewById(R.id.email_sign_in_button);
@@ -224,14 +227,17 @@ public class ConnectionFragment extends Fragment{
 
         //RetransmissionRate
         float hz = Float.parseFloat( mRetransmissionRate.getSelectedItem().toString() );
-        Settings.getInstance().setMessageRate(hz);
+        Settings.getInstance().setMessageRateInHz(hz);
 
         //mTransmissionSec
         float transmissionSec = Float.parseFloat( mTransmissionSec.getSelectedItem().toString() );
-        Settings.getInstance().setMessageRetransmissionTime( transmissionSec );
+        Settings.getInstance().setMessageRetransmissionTimeInSec(transmissionSec);
 
         //save
         Settings.getInstance().save( getActivity().getApplicationContext() );
+
+        if(onSave!=null)
+            onSave.run("");
     }
 
     private boolean isAddressValid(String email) {

@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -104,12 +105,14 @@ public class Tabedctivity extends AppCompatActivity {
     private int DrawableID = -1;
     private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus)
     {
+        Log.v("onConnectionStatusChange",newStatus.toString());
+
         switch (newStatus)
         {
-            case disconnected: DrawableID = android.R.drawable.button_onoff_indicator_off;    break;
-            case connected:    DrawableID = android.R.drawable.button_onoff_indicator_on; break;
-            case connecting:   DrawableID = android.R.drawable.ic_menu_recent_history;      break;
-            case error:        DrawableID = android.R.drawable.ic_dialog_alert;   break;
+            case disconnected: DrawableID = android.R.drawable.button_onoff_indicator_off; break;
+            case connected:    DrawableID = android.R.drawable.button_onoff_indicator_on;  break;
+            case connecting:   DrawableID = android.R.drawable.ic_menu_recent_history;     break;
+            case error:        DrawableID = android.R.drawable.ic_dialog_alert;            break;
         }
         if(DrawableID==-1)
             return;

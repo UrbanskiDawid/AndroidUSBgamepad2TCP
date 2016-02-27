@@ -124,9 +124,11 @@ public class TCPclient {
                 //---
 
             } catch (Exception e) {
-                Log.e(TCPclient.class.getName(), e.toString());
-                errorMgs+=e.toString();
-                ret=false;
+                if(mRun!=false) {
+                    Log.e(TCPclient.class.getName(), e.toString());
+                    errorMgs += e.toString();
+                    ret = false;
+                }
             } finally {
                 stop();
                 socket.close();//the socket must be closed.

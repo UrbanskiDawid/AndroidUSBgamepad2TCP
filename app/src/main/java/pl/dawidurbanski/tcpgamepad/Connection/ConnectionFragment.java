@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import android.os.Handler;
+
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.Settings;
 
@@ -55,6 +57,7 @@ public class ConnectionFragment extends Fragment{
     }
 
     ConnectionStatus mConnectionStatus = ConnectionStatus.unknown;
+    Handler mHandler = new Handler();
     void updateConnectionStatus(ConnectionStatus newStatus)  {
         if(mConnectionStatus==newStatus)
             return;
@@ -62,6 +65,19 @@ public class ConnectionFragment extends Fragment{
         if(mConnectionStatus==ConnectionStatus.error){
             if(newStatus!=ConnectionStatus.connecting)
                 return;
+        }
+
+        if(newStatus==ConnectionStatus.error){
+            mHandler.postDelayed(new Runnable(){
+                @Override
+                public void run() {
+                    Log.v("updateConnectionStatus","update error to disconnected");
+                    if(mConnectionStatus==ConnectionStatus.error) {
+                        mConnectionStatus = ConnectionStatus.unknown;
+                        updateConnectionStatus(ConnectionStatus.disconnected);
+                    }
+                }
+            }, 5000 );
         }
 
         mConnectionStatus = newStatus;
@@ -139,8 +155,6 @@ public class ConnectionFragment extends Fragment{
                 onDataFilled();
             }
         });
-
-        updateConnectionStatus(ConnectionStatus.disconnected);
 
         return rootView;
     }

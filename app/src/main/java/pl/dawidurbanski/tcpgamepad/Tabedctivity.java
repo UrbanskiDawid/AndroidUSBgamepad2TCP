@@ -14,7 +14,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,6 +37,8 @@ public class Tabedctivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private CustomViewPager mViewPager = null;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +83,7 @@ public class Tabedctivity extends AppCompatActivity {
         };
 
         //Floating Action Button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,6 +100,26 @@ public class Tabedctivity extends AppCompatActivity {
     }
 
     Timer timer=null;
+
+    private int DrawableID = -1;
+    private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus)
+    {
+        switch (newStatus)
+        {
+            case disconnected: DrawableID = android.R.drawable.button_onoff_indicator_off;    break;
+            case connected:    DrawableID = android.R.drawable.button_onoff_indicator_on; break;
+            case connecting:   DrawableID = android.R.drawable.ic_menu_recent_history;      break;
+            case error:        DrawableID = android.R.drawable.ic_dialog_alert;   break;
+        }
+        if(DrawableID==-1)
+            return;
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                fab.setImageDrawable( getResources().getDrawable(DrawableID, getBaseContext().getTheme()) );
+            }
+        });
+    }
 
     /*
      * starts /restart Fixed event
@@ -232,6 +253,13 @@ public class Tabedctivity extends AppCompatActivity {
                 @Override
                 public void run(String str) {
                     restartTimmer();
+                }
+            };
+
+            mConnectionFragment.onConnectionStatusChange = new ConnectionFragment.OnConnectionStatusEvent() {
+                @Override
+                public void change(ConnectionFragment.ConnectionStatus newStatus) {
+                    onConnectionStatusChange(newStatus);
                 }
             };
         }

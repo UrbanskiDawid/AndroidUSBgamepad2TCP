@@ -42,6 +42,33 @@ public class ConnectionFragment extends Fragment{
     public OnEvent onLog=null,
                    onSave=null;
 
+    public interface OnConnectionStatusEvent { void change(ConnectionStatus newStatus);   }
+    public OnConnectionStatusEvent onConnectionStatusChange=null;
+
+    public enum ConnectionStatus
+    {
+        unknown,
+        disconnected,
+        error,//only connecting cant change this state
+        connecting,
+        connected
+    }
+
+    ConnectionStatus mConnectionStatus = ConnectionStatus.unknown;
+    void updateConnectionStatus(ConnectionStatus newStatus)  {
+        if(mConnectionStatus==newStatus)
+            return;
+
+        if(mConnectionStatus==ConnectionStatus.error){
+            if(newStatus!=ConnectionStatus.connecting)
+                return;
+        }
+
+        mConnectionStatus = newStatus;
+        if(onConnectionStatusChange!=null)
+            onConnectionStatusChange.change(mConnectionStatus);
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -113,6 +140,8 @@ public class ConnectionFragment extends Fragment{
             }
         });
 
+        updateConnectionStatus(ConnectionStatus.disconnected);
+
         return rootView;
     }
 
@@ -126,12 +155,16 @@ public class ConnectionFragment extends Fragment{
     }
 
     public void disconnect() {
+        updateConnectionStatus(ConnectionStatus.disconnected);
         if(!isConnected()) return;
         Log("disconnecting!");
         mAuthTask.tcPclient.stop();
     }
 
     public void connect() {
+
+        updateConnectionStatus(ConnectionStatus.connecting);
+
         String address = Settings.getInstance().address;
         int port = Settings.getInstance().port;
 
@@ -146,6 +179,7 @@ public class ConnectionFragment extends Fragment{
             @Override
             public void run(String str) {
                 Log("connected!");
+                updateConnectionStatus(ConnectionStatus.connected);
             }
         };
         mAuthTask.onEnd=new TCPconnectionTask.OnEvent() {
@@ -153,12 +187,14 @@ public class ConnectionFragment extends Fragment{
             public void run(String msg) {
             Log("connection end " + msg);
             mAuthTask.cancel(true) ;mAuthTask = null;
+            updateConnectionStatus(ConnectionStatus.disconnected);
             }
         };
         mAuthTask.onFail=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String msg) {
             Log("connection fail " + msg);
+            updateConnectionStatus(ConnectionStatus.error);
             }
         };
         mAuthTask.execute((Void) null);

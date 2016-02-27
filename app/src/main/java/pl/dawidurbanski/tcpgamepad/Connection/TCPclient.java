@@ -1,6 +1,7 @@
 package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -91,15 +92,6 @@ public class TCPclient {
 
         Socket socket = new Socket();
         try {
-            //here you must put your computer's IP address.
-            InetAddress serverAddr = InetAddress.getByName(mADRESS_IP);
-
-            if(!serverAddr.isReachable(1000))
-            {
-                errorMgs+=mADRESS_IP+" is unreachable";
-                Log.w("TCPclient",errorMgs);
-                return false;
-            }
 
             Log.i("TCPclient","connecting "+adress+":"+port+" (timeout:"+CONNECTION_CONNECT_TIMEOUT+")");
 

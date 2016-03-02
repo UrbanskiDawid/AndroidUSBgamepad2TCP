@@ -69,7 +69,7 @@ public class Message {
     static public byte [] generate(float roll, float pitch, float yaw, float throttle) {
 
         ByteBuffer ret = ByteBuffer.allocate(messageLen);
-        ret.order(ByteOrder.BIG_ENDIAN);
+        ret.order(ByteOrder.LITTLE_ENDIAN);
 
         ret.put(prefix);                  // 0- 3 prefix
         ret.putFloat(roll);               // 4- 7 roll

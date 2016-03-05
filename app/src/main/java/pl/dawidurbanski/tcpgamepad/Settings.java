@@ -23,17 +23,20 @@ public class Settings {
     private static Integer SETTINGS_PORT_DEFAULT = 8080;
     private static Integer SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT = 50;//in MS (aka 20times per sec)
     private static Integer SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT = 200;//number of repetition (10sec for rate=50)
+    private static boolean SETTINGS_ENABLE_LITTLE_ENDIAN_DEFAULT = true;
 
     public static String address = SETTINGS_ADDRESS_DEFAULT;
     public static int port = SETTINGS_PORT_DEFAULT;
     public static int messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
     public static int messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
+    private static boolean enableLittleEndian = SETTINGS_ENABLE_LITTLE_ENDIAN_DEFAULT;
 
     private static String
        SETTINGS_ADDRESS = "address",
        SETTINGS_PORT = "port",
        SETTINGS_MESSAGE_RETRANSMISSION_RATE = "msgRate",
-       SETTINGS_MESSAGE_RETRANSMISSION_NUM  = "msgNum";
+       SETTINGS_MESSAGE_RETRANSMISSION_NUM  = "msgNum",
+       SETTINGS_ENABLE_LITTLE_ENDIAN = "enableLittleEndian";
 
     /*
      * message rate is stored as milliseconds between sending message
@@ -68,6 +71,15 @@ public class Settings {
         Log.e("RetransmissionTime","("+sec+"sec) :="+messageRetransmissionNum + " number of retransmissions @"+ getMessageRateInHz()+"Hz");
     }
 
+    public void setEnableLittleEndianMessageByteOrder(boolean littleEndianMessageByteOrder) {
+        enableLittleEndian =littleEndianMessageByteOrder;
+        Log.e("EnableLittleEndian",""+ enableLittleEndian);
+    }
+
+    public boolean isEnableLittleEndianMessageByteOrder(){
+        return enableLittleEndian;
+    }
+
     public void save(Context context) {
         if(context==null) {
             Log.e(Settings.class.getName()+":"," save() !contest is null! )");
@@ -80,6 +92,7 @@ public class Settings {
         edit.putInt(SETTINGS_PORT, port);
         edit.putInt(SETTINGS_MESSAGE_RETRANSMISSION_RATE, messageRetransmissionRate);
         edit.putInt(SETTINGS_MESSAGE_RETRANSMISSION_NUM, messageRetransmissionNum);
+        edit.putBoolean(SETTINGS_ENABLE_LITTLE_ENDIAN, enableLittleEndian);
         edit.commit();
         Toast.makeText(context, "Settings are saved.",Toast.LENGTH_SHORT).show();
     }
@@ -95,16 +108,20 @@ public class Settings {
             port = sp.getInt(SETTINGS_PORT, SETTINGS_PORT_DEFAULT);
             messageRetransmissionRate = sp.getInt(SETTINGS_MESSAGE_RETRANSMISSION_RATE, SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT);
             messageRetransmissionNum = sp.getInt(SETTINGS_MESSAGE_RETRANSMISSION_NUM, SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT);
+            enableLittleEndian = sp.getBoolean(SETTINGS_ENABLE_LITTLE_ENDIAN, SETTINGS_ENABLE_LITTLE_ENDIAN_DEFAULT);
+
         }catch (Exception e){
             address = SETTINGS_ADDRESS_DEFAULT;
             port = SETTINGS_PORT_DEFAULT;
             messageRetransmissionRate = SETTINGS_MESSAGE_RETRANSMISSION_RATE_DEFAULT;
             messageRetransmissionNum = SETTINGS_MESSAGE_RETRANSMISSION_NUM_DEFAULT;
+            enableLittleEndian = SETTINGS_ENABLE_LITTLE_ENDIAN_DEFAULT;
         }
         Log.e("Settings","load() address="+address+";");
         Log.e("Settings","load() port  ="+port+"; ");
         Log.e("Settings","load() messageRetransmissionRate="+messageRetransmissionRate+" : "+ getMessageRateInHz()+"Hz; ");
         Log.e("Settings","load() messageRetransmissionNum ="+messageRetransmissionNum+ " : "+ getMessageRetransmissionTimeInSec()+"sec;");
+        Log.e("Settings","load() enableLittleEndian ="+ enableLittleEndian + " : "+ getMessageRetransmissionTimeInSec()+"sec;");
 
         Toast.makeText(context, "Settings loaded.",Toast.LENGTH_SHORT).show();
     }

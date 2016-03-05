@@ -47,23 +47,7 @@
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
-<!--
-            <LinearLayout android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="2"
-                android:orientation="horizontal">
 
-                <Button android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="somebutton"/>
-
-                <Button android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="somebutton"/>
-            </LinearLayout>
--->
         <LinearLayout
             android:layout_margin="@dimen/text_margin"
             android:layout_width="match_parent"
@@ -107,6 +91,29 @@
                     android:prompt="@string/retransmissionSec_prompt" />
             </LinearLayout>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/LinearLayout02"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_alignParentBottom="true">
+            <TextView
+                android:id="@+id/Button02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Message byte-order">
+            </TextView>
+            <Switch
+                android:id="@+id/MessageByteOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:showText="true"
+                android:textOff="BigEndian"
+                android:textOn="SmallEndian">
+            </Switch>
         </LinearLayout>
 
         <Button

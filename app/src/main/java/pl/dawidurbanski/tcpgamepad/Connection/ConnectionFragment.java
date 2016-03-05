@@ -15,6 +15,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import android.os.Handler;
@@ -39,6 +40,8 @@ public class ConnectionFragment extends Fragment{
             mRetransmissionRate = null;
 
     TCPconnectionTask mAuthTask = null;
+
+    private Switch mSwitch = null;
 
     public interface OnEvent { void run(String str);   }
     public OnEvent onLog=null,
@@ -131,10 +134,10 @@ public class ConnectionFragment extends Fragment{
                 = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.transmissionRate));
         mRetransmissionRate.setAdapter(spinnerAdapter1);
 
-        String s1 = ""+Math.round(Settings.getInstance().getMessageRateInHz());
-        int spinnerPosition1 = spinnerAdapter1.getPosition( s1 );
+        String s1 = "" + Math.round(Settings.getInstance().getMessageRateInHz());
+        int spinnerPosition1 = spinnerAdapter1.getPosition(s1);
         mRetransmissionRate.setSelection(spinnerPosition1);
-        Log.e("ConnectionFragment", "onCreateView() : messageRate='" + s1 +"' / '"+ Settings.getInstance().messageRetransmissionRate+ "' found at:" + spinnerPosition1);
+        Log.e("ConnectionFragment", "onCreateView() : messageRate='" + s1 + "' / '" + Settings.getInstance().messageRetransmissionRate + "' found at:" + spinnerPosition1);
 
         //messageSec
         mTransmissionSec = (Spinner) rootView.findViewById(R.id.transmissionSec);
@@ -142,12 +145,16 @@ public class ConnectionFragment extends Fragment{
                 = new ArrayAdapter<>(rootView.getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.retransmissionSec));
         mTransmissionSec.setAdapter(spinnerAdapter2);
 
-        String s2 = ""+Math.round(Settings.getInstance().getMessageRetransmissionTimeInSec());
+        String s2 = "" + Math.round(Settings.getInstance().getMessageRetransmissionTimeInSec());
         int spinnerPosition2 = spinnerAdapter2.getPosition(s2);
         mTransmissionSec.setSelection(spinnerPosition2);
-        Log.e("ConnectionFragment", "onCreateView() : messageSec='" + s2 + "' / '"+Settings.getInstance().messageRetransmissionNum+"' found at:" + spinnerPosition2);
+        Log.e("ConnectionFragment", "onCreateView() : messageSec='" + s2 + "' / '" + Settings.getInstance().messageRetransmissionNum + "' found at:" + spinnerPosition2);
 
+        //MessageByteOrder
+        mSwitch = (Switch) rootView.findViewById(R.id.MessageByteOrder);
+        mSwitch.setChecked( Settings.getInstance().isEnableLittleEndianMessageByteOrder() );
 
+        //Submit
         Button mEmailSignInButton = (Button) rootView.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,6 +289,10 @@ public class ConnectionFragment extends Fragment{
         //mTransmissionSec
         float transmissionSec = Float.parseFloat( mTransmissionSec.getSelectedItem().toString() );
         Settings.getInstance().setMessageRetransmissionTimeInSec(transmissionSec);
+
+        //MessageByteOrder
+        boolean messageByteOrder = mSwitch.isChecked();
+        Settings.getInstance().setEnableLittleEndianMessageByteOrder(messageByteOrder);
 
         //save
         Settings.getInstance().save( getActivity().getApplicationContext() );

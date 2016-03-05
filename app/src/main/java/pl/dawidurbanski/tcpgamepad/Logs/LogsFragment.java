@@ -49,7 +49,7 @@ public class LogsFragment extends Fragment {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 String dateTime =sdf.format(new Date());
 
-                mMyList.add(0, dateTime + ": " + str);
+                mMyList.add(0, dateTime + ":" + str);
 
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();

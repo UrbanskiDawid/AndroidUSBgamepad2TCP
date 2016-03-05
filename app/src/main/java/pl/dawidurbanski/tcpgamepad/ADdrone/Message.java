@@ -1,7 +1,12 @@
 package pl.dawidurbanski.tcpgamepad.ADdrone;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Created by Dawid on 24.01.2016.
@@ -66,25 +71,45 @@ public class Message {
     /*
      generate message as byte array
      */
-    static public byte [] generate(float roll, float pitch, float yaw, float throttle) {
+    static public byte [] generate(float roll, float pitch, float yaw, float throttle, boolean littleEndianByteOrder) {
 
         ByteBuffer ret = ByteBuffer.allocate(messageLen);
-        ret.order(ByteOrder.LITTLE_ENDIAN);
+        if(littleEndianByteOrder) ret.order(ByteOrder.LITTLE_ENDIAN);
+        else                      ret.order(ByteOrder.BIG_ENDIAN);
 
-        ret.put(prefix);                  // 0- 3 prefix
-        ret.putFloat(roll);               // 4- 7 roll
-        ret.putFloat(pitch);              // 8-11 pitch
-        ret.putFloat(yaw);                //12-15 yaw
-        ret.putFloat(throttle);           //16-19 throttle
-        ret.putShort(commandManual);      //20-21 commandManual
-        ret.put(solverModeStabilization); //22
-        ret.put(notInUse);                //23-35
+        ret.put(prefix);                  //  0- 3 prefix
+        ret.putFloat(roll);               //  4- 7 roll
+        ret.putFloat(pitch);              //  8-11 pitch
+        ret.putFloat(yaw);                // 12-15 yaw
+        ret.putFloat(throttle);           // 16-19 throttle
+        ret.putShort(commandManual);      // 20-21 commandManual
+        ret.put(solverModeStabilization); // 22
+        ret.put(notInUse);                // 23-35
+        ret.put(calculateCRC16(ret.array(), 4, 31));  //36-37 CRC calculated only from payload data
 
-        // CRC calculated only from payload data
-        byte [] crc = calculateCRC16(ret.array(), 4, 31);
-        ret.put(crc);                     //36-37 CRC
-
+        System.out.println( toHexString(ret.array()) );
         return ret.array();
+    }
+
+    /*
+     24242424|00000000|00000000|00000000|0040103c|e803|0a|ffffffffffffffffffffffffff|27a5
+     24242424|00000000|00000000|00000000|3c104000|03e8|0a|ffffffffffffffffffffffffff|a527
+     */
+    static public String toHexString(byte [] arr)
+    {
+        List<Integer> separators = Arrays.asList(4,8,12,16,20,22,23,36);
+
+        String ret="";
+        for(int i=0;i<arr.length;i++) {
+
+            int intVal = arr[i] & 0xff;
+            if (intVal < 0x10)    ret+="0";
+            ret+= Integer.toHexString(intVal);
+
+            if(separators.contains(i+1))
+                ret+="|";
+        }
+        return ret;
     }
 
     /*

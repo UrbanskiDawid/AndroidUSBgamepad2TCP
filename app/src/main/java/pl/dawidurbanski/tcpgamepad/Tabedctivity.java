@@ -184,14 +184,17 @@ public class Tabedctivity extends AppCompatActivity {
     private void sentMessage(String name,float axis1,float axis2,float axis3,float axis4)
     {
         messageNum = Settings.getInstance().messageRetransmissionNum;
-        message = Message.generate(axis1, axis2, axis3, axis4);
-        String messageStr = Message.toStringAsInts(message).replace("|", "\n");
+        boolean littleEndianByteOrder = Settings.getInstance().isEnableLittleEndianMessageByteOrder();
+        message = Message.generate(axis1, axis2, axis3, axis4, littleEndianByteOrder);
 
         String axisStr = ""
                 + String.format("%+.01f ", axis1)+ ","
                 + String.format("%+.01f ", axis2)+ " "
                 + String.format("%+.01f ", axis3)+ ","
                 + String.format("%+.01f ", axis4)+ " ";
+
+        String messageStr = Message.toHexString(message).replace("|", "|\n");
+
         Log2List("Move: '"+name+"'" + axisStr + " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec \n" + messageStr);
     }
 

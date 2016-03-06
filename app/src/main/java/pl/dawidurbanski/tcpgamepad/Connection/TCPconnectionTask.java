@@ -18,6 +18,9 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
             onFail = null,
             onMessage = null;
 
+    private Watchdog connectionWatchdog;
+    private int watchdogPatienceMS = 10*1000;//how long will dog wait for food
+
     private boolean mIsConnected = false;
     public boolean isIsConnected() { return mIsConnected; }
 
@@ -41,6 +44,12 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
                 if(onConnected!=null) onConnected.run("connected");
             }
         };
+
+        connectionWatchdog = new Watchdog(watchdogPatienceMS,
+            new Watchdog.OnEvent() {
+                @Override
+                public void run() {watchdogStarved();                }
+            });
     }
 
     @Override
@@ -53,6 +62,7 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
         try {
+            connectionWatchdog.feed();
             Log.i("TCPconnectionTask","connecting"+mAdress+":"+mPort);
             ret=tcPclient.run(mAdress,mPort);
         } catch (Exception e) {
@@ -60,6 +70,7 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
             ret =false;
         }finally {
             mIsConnected=false;
+            connectionWatchdog.kill();
             tcPclient.stop();
         }
 
@@ -69,14 +80,33 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
         return ret;
     }
 
+    /*
+     *you did not take good care for more than 'watchdogPatienceMS' and now the dog is gone
+     */
+    public void watchdogStarved()  {
+        Log.e(this.getClass().getName(), "watch dog starved!");
+        tcPclient.stop();
+        fail("watch dog starved!");
+    }
+
     @Override
     protected void onPostExecute(final Boolean success) {
         end("connection End (success: " + ((success) ? "yes" : "no") + ")");
     }
 
-    private void end(String str)    { if(onEnd!=null)     onEnd.run(str);    }
-    private void fail(String str)   { if(onFail!=null)    onFail.run(str);   }
-    private void message(String str){ if(onMessage!=null) onMessage.run(str);}
+    private void end(String str)    { if(onEnd!=null)     onEnd.run(str);     }
+    private void fail(String str)   { if(onFail!=null)    onFail.run(str);    }
+    private void message(String str)
+    {
+        str = str.trim();
+        if(str.startsWith("tick")) {
+            Log.d(this.getClass().getName(),"message('tick') feeding connectionWatchdog.");
+            connectionWatchdog.feed();
+            return;
+        }
+
+        if(onMessage!=null) onMessage.run(str);
+    }
 
     @Override
     protected void onCancelled() {

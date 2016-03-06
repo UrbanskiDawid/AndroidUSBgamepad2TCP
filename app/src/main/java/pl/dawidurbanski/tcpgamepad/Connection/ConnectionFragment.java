@@ -2,6 +2,7 @@ package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,8 +18,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-
-import android.os.Handler;
 
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.Settings;
@@ -196,6 +195,12 @@ public class ConnectionFragment extends Fragment{
 
         Log("connecting to "+address+":"+port);
         mAuthTask = new TCPconnectionTask(address,port);
+        mAuthTask.onMessage= new TCPconnectionTask.OnEvent() {
+            @Override
+            public void run(String str) {
+                Log("incoming:"+str);
+            }
+        };
         mAuthTask.onConnected=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String str) {

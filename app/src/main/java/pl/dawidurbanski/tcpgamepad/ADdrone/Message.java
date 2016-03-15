@@ -1,9 +1,7 @@
 package pl.dawidurbanski.tcpgamepad.ADdrone;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,7 +85,6 @@ public class Message {
         ret.put(notInUse);                // 23-35
         ret.put(calculateCRC16(ret.array(), 4, 31));  //36-37 CRC calculated only from payload data
 
-        System.out.println( toHexString(ret.array()) );
         return ret.array();
     }
 

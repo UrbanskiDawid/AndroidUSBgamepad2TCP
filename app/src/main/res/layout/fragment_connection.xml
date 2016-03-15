@@ -111,8 +111,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:showText="true"
-                android:textOff="BigEndian"
-                android:textOn="SmallEndian">
+                android:textOff="LittleEndian"
+                android:textOn="BigEndian">
             </Switch>
         </LinearLayout>
 

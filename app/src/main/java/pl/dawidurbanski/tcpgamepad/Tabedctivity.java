@@ -105,7 +105,7 @@ public class Tabedctivity extends AppCompatActivity {
     private int DrawableID = -1;
     private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus)
     {
-        Log.v("onConnectionStatusChange",newStatus.toString());
+        Log.v("ConnectionStatusChange",newStatus.toString());
 
         switch (newStatus)
         {
@@ -185,6 +185,7 @@ public class Tabedctivity extends AppCompatActivity {
     {
         messageNum = Settings.getInstance().messageRetransmissionNum;
         boolean littleEndianByteOrder = Settings.getInstance().isEnableLittleEndianMessageByteOrder();
+        //this will drop messages only one msg can be in que
         message = Message.generate(axis1, axis2, axis3, axis4, littleEndianByteOrder);
 
         String axisStr = ""
@@ -195,7 +196,11 @@ public class Tabedctivity extends AppCompatActivity {
 
         String messageStr = Message.toHexString(message).replace("|", "|\n");
 
-        Log2List("Move: '"+name+"'" + axisStr + " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec \n" + messageStr);
+        Log2List("Move: '"+name+"'" +
+                 axisStr + "\n"+
+                 " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec \n"+
+                 messageStr +"\n"+
+                 (littleEndianByteOrder ? "littleEndian" : "bigEndian" ) );
     }
 
     @Override

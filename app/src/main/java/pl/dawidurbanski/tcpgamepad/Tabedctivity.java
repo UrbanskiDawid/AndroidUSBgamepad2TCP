@@ -1,6 +1,7 @@
 package pl.dawidurbanski.tcpgamepad;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -12,8 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,6 +48,14 @@ public class Tabedctivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
 
+    private ImageView mSignal = null;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //getMenuInflater().inflate(R.menu.menu_tabedctivity, menu); TODO: in next commit
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +63,27 @@ public class Tabedctivity extends AppCompatActivity {
 
         Settings.getInstance().load(getApplicationContext());
 
+        //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(null);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch(item.getItemId())
+                {
+                    case R.id.menu_optical_latency_tester:
+                        Toast.makeText(getApplicationContext(), "menu!", Toast.LENGTH_SHORT).show();
+                    break;
+                    case R.id.menu_about:
+                        Toast.makeText(getApplicationContext(), "AD!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                return false;
+            }
+        });
+        //----
+
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -97,22 +131,50 @@ public class Tabedctivity extends AppCompatActivity {
         });
         //--
 
+        mSignal = (ImageView)findViewById(R.id.signal);
+
         restartTimmer();
+    }
+
+    boolean doubleBackToExit_PressedOnce=false;
+    int doubleBackToExit_MaxTimeBetweenPresses=2000;//in milliseconds
+    @Override
+    public void onBackPressed() {
+
+        if (doubleBackToExit_PressedOnce) {
+            super.onBackPressed();
+            return;
+        }else {
+           doubleBackToExit_PressedOnce = true;
+        }
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() { doubleBackToExit_PressedOnce=false; }
+        }, doubleBackToExit_MaxTimeBetweenPresses);
     }
 
     Timer timer=null;
 
     private int DrawableID = -1;
+    private int DrawableID_signal = R.drawable.ic_signal_cellular_off_black_24dp;
     private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus)
     {
         Log.v("ConnectionStatusChange",newStatus.toString());
 
         switch (newStatus)
         {
-            case disconnected: DrawableID = android.R.drawable.button_onoff_indicator_off; break;
-            case connected:    DrawableID = android.R.drawable.button_onoff_indicator_on;  break;
-            case connecting:   DrawableID = android.R.drawable.ic_menu_recent_history;     break;
-            case error:        DrawableID = android.R.drawable.ic_dialog_alert;            break;
+            case disconnected: DrawableID = android.R.drawable.button_onoff_indicator_off;
+                               DrawableID_signal = R.drawable.ic_signal_cellular_off_black_24dp;
+            break;
+            case connected:    DrawableID = android.R.drawable.button_onoff_indicator_on;
+                               DrawableID_signal = R.drawable.ic_signal_cellular_4_bar_black_24dp;
+            break;
+            case connecting:   DrawableID = android.R.drawable.ic_menu_recent_history;
+            break;
+            case error:        DrawableID = android.R.drawable.ic_dialog_alert;
+                               DrawableID_signal = R.drawable.ic_signal_cellular_off_black_24dp;
+            break;
         }
         if(DrawableID==-1)
             return;
@@ -120,6 +182,7 @@ public class Tabedctivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             public void run() {
                 fab.setImageDrawable( getResources().getDrawable(DrawableID, getBaseContext().getTheme()) );
+                mSignal.setImageDrawable( getResources().getDrawable(DrawableID_signal, getBaseContext().getTheme()) );
             }
         });
     }
@@ -222,8 +285,27 @@ public class Tabedctivity extends AppCompatActivity {
         if(position==mSelectedPage) return;
         mSelectedPage=position;
 
-        if(position==3)  mViewPager.setPagingEnabled(false);
-        else             mViewPager.setPagingEnabled(true);
+        if(position==3) setFullScreenMode(true);
+        else            setFullScreenMode(false);
+    }
+
+    public void setFullScreenMode(boolean fullScreen)
+    {
+        android.support.v7.app.ActionBar ab=getSupportActionBar();
+        Window window = getWindow();
+        if(fullScreen) {
+            mViewPager.setPagingEnabled(false);
+            if(ab!=null) ab.hide();
+            if(fab!=null) fab.hide();
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }else{
+            mViewPager.setPagingEnabled(true);
+            if(ab!=null) ab.show();
+            if(fab!=null) fab.show();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
     }
 
     /**

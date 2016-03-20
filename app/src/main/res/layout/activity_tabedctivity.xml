@@ -22,7 +22,20 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:typeface="monospace"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:id="@+id/toolbar_title" />
+            <ImageView
+                android:id="@+id/signal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:src="@drawable/ic_signal_cellular_off_black_24dp"/>
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.TabLayout
@@ -42,7 +55,7 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
+        android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/button_onoff_indicator_off" />
 

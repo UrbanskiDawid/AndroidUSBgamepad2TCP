@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pl.dawidurbanski.tcpgamepad.Tabedctivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/menu_optical_latency_tester"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="optical latency tester"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_about"
+        android:orderInCategory="100"
+        android:title="about"
         app:showAsAction="never" />
 </menu>

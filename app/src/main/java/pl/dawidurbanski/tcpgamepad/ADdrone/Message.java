@@ -15,6 +15,10 @@ import java.util.List;
  */
 public class Message {
 
+    public interface ADdroneMessageInterface {
+        void sendMessage(String name, float axis1, float axis2, float axis3, float axis4);
+    }
+
     /*
     Length of message in bytes.
      */

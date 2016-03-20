@@ -29,10 +29,11 @@ import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
+import pl.dawidurbanski.tcpgamepad.LatencyTest.OpticalLatencyTestFragment;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
 
-public class Tabedctivity extends AppCompatActivity {
+public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMessageInterface {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -52,7 +53,7 @@ public class Tabedctivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.menu_tabedctivity, menu); TODO: in next commit
+        getMenuInflater().inflate(R.menu.menu_tabedctivity, menu);
         return true;
     }
 
@@ -70,20 +71,19 @@ public class Tabedctivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch(item.getItemId())
-                {
-                    case R.id.menu_optical_latency_tester:
-                        Toast.makeText(getApplicationContext(), "menu!", Toast.LENGTH_SHORT).show();
-                    break;
-                    case R.id.menu_about:
-                        Toast.makeText(getApplicationContext(), "AD!", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                return false;
+            switch(item.getItemId())
+            {
+                case R.id.menu_optical_latency_tester:
+                    OpticalLatencyTestFragment.popup(getSupportFragmentManager());
+                break;
+                case R.id.menu_about:
+                    AboutFragment.popup(getSupportFragmentManager());
+                break;
+            }
+            return false;
             }
         });
         //----
-
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -216,6 +216,8 @@ public class Tabedctivity extends AppCompatActivity {
         }
     }
 
+
+
     private void Log2List(String str) {
         mSectionsPagerAdapter.mLogFragment.Log2List(str);
     }
@@ -244,11 +246,12 @@ public class Tabedctivity extends AppCompatActivity {
 
     private int messageNum =0;
     private byte [] message = null;//if null no data will be sent
-    private void sentMessage(String name,float axis1,float axis2,float axis3,float axis4)
+    @Override
+    public void sendMessage(String name, float axis1, float axis2, float axis3, float axis4)
     {
         messageNum = Settings.getInstance().messageRetransmissionNum;
         boolean littleEndianByteOrder = Settings.getInstance().isEnableLittleEndianMessageByteOrder();
-        //this will drop messages only one msg can be in que
+        //this will drop messages. only one msg can be in queue
         message = Message.generate(axis1, axis2, axis3, axis4, littleEndianByteOrder);
 
         String axisStr = ""
@@ -271,7 +274,7 @@ public class Tabedctivity extends AppCompatActivity {
         GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            sentMessage("gamePad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
+            sendMessage("gamePad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
             return true;
         }
         return super.onGenericMotionEvent(event);
@@ -338,7 +341,7 @@ public class Tabedctivity extends AppCompatActivity {
                 public void onMove(float x, float y, float a, float b) {
                     // throttle is value form 0 to 1
                     float throttle = (b + 1.0f) / 2.0f;
-                    sentMessage("virtual",x,y,a,throttle);
+                    sendMessage("virtual",x,y,a,throttle);
                 }
             };
 

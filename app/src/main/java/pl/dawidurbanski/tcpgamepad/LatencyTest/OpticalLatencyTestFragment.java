@@ -2,7 +2,6 @@ package pl.dawidurbanski.tcpgamepad.LatencyTest;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -28,7 +27,7 @@ import pl.dawidurbanski.tcpgamepad.R;
  */
 public class OpticalLatencyTestFragment extends DialogFragment implements View.OnClickListener {
 
-    Message.ADdroneMessageInterface mListener = null;
+    private Message.ADdroneMessageInterface mListener = null;
 
     public static void popup(FragmentManager fm /*getSupportFragmentManager*/) {
         DialogFragment dialog = new OpticalLatencyTestFragment();
@@ -44,10 +43,9 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         try {
             mListener = (Message.ADdroneMessageInterface) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnArticleSelectedListener");
+            throw new ClassCastException(activity.toString() + " must implement '" + Message.ADdroneMessageInterface.class.getName() + "'");
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +57,7 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         if(mTextView==null) Log.e("OpticalLatencyTest","cant find textView!");
 
         mFrame = (FrameLayout) v.findViewById(R.id.MatinTestFrame);
-        if(mFrame==null) Log.e("OpticalLatencyTest","cant find FrameLayout !");
+        if(mFrame==null) Log.e("OpticalLatencyTest","cant find FrameLayout!");
 
         reset();
 
@@ -77,7 +75,6 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         }
     }
 
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
@@ -88,10 +85,11 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog)
-    {
-       if(started)
-           reset();
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("OpticalLatencyTest","onDestroy");
+        if(started)
+            reset();
     }
 
     boolean started = false;
@@ -114,8 +112,7 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         }, 0, tickTime);
     }
 
-    void setText(final String str,final int textColor,final int BGcolor)
-    {
+    void setText(final String str,final int textColor,final int BGcolor) {
         FragmentActivity fa = getActivity();
         if(fa==null){
             Log.e("OpticalLatencyTest","setText failed: missing fragmentActivity.");
@@ -130,19 +127,17 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         });
     }
 
-    void reset()
-    {
+    void reset() {
         setText(getString(R.string.OpticalLatencyTestFragment_prompt),Color.WHITE,Color.BLACK);
         started=false;
         if(timer!=null) timer.cancel();
     }
 
-    int tickTime = 1000;
-    int tickCooldown = 2;//cooldown in ticks colldown time (tickTime*tickCooldown)
-    int tickCount= 0;
-    static final int tickCountMax=5;
-    void tick()
-    {
+    private int tickTime = 1000;
+    private int tickCooldown = 5;//cooldown in ticks colldown time (tickTime*tickCooldown)
+    private static final int tickCountMax=5;
+    private int tickCount= 0;
+    void tick() {
         tickCount++;
         Log.d("OpticalLatencyTest","tick"+tickCount);
 

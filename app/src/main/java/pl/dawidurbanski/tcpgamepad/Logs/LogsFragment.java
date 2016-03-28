@@ -2,6 +2,7 @@ package pl.dawidurbanski.tcpgamepad.Logs;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,6 @@ public class LogsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param name Name of this log.
      * @return A new instance of fragment LogsFragment.
      */
     public static LogsFragment newInstance() {
@@ -42,7 +42,13 @@ public class LogsFragment extends Fragment {
 
     public void Log2List(final String str) {
 
-        getActivity().runOnUiThread(new Runnable() {
+        FragmentActivity fa = getActivity();
+        if(fa==null){
+            Log.e(LogsFragment.class.getName(),"FragmentActivity==null");
+            return;
+        }
+
+        fa.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.

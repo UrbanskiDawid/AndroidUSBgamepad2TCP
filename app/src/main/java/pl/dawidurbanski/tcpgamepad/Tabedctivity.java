@@ -48,6 +48,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
     private CustomViewPager mViewPager = null;
 
+    private Toolbar mToolbar = null;
     private FloatingActionButton fab;
 
     private ImageView mSignal = null;
@@ -66,10 +67,10 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         Settings.getInstance().load(getApplicationContext());
 
         //Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(null);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(null);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
             switch(item.getItemId())
@@ -116,7 +117,6 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
-
 
         mSectionsPagerAdapter.mConnectionFragment.onLog = new ConnectionFragment.OnEvent() {
             @Override
@@ -281,13 +281,13 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         return super.onGenericMotionEvent(event);
     }
 
-    private int mSelectedPage = -1;
+    private int mSelectedPageID = -1;
 
     //called by ViewPager
     private void onViewPagerSelectPage(int position)
     {
-        if(position==mSelectedPage) return;
-        mSelectedPage=position;
+        if(position== mSelectedPageID) return;
+        mSelectedPageID =position;
         Log.d(Tabedctivity.class.getName(),"selected tab: "+position);
 
         if(position==3) {

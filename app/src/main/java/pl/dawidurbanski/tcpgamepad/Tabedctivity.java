@@ -1,7 +1,6 @@
 package pl.dawidurbanski.tcpgamepad;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -32,6 +31,7 @@ import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.LatencyTest.OpticalLatencyTestFragment;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
+import pl.dawidurbanski.tcpgamepad.tools.OnBackKeyActions;
 
 public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMessageInterface {
 
@@ -44,6 +44,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private TabLayout mTabLayout;
 
     private CustomViewPager mViewPager = null;
 
@@ -85,6 +86,12 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         });
         //----
 
+        mOnBack = new OnBackKeyActions(2000, getApplicationContext());
+        mOnBack.setDefaultAction(null, new OnBackKeyActions.iActions() {
+            @Override
+            public void onDoublePress() { Tabedctivity.super.onBackPressed(); }
+        });
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -107,8 +114,9 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             public void onPageScrollStateChanged(int state) {}
         });
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+
 
         mSectionsPagerAdapter.mConnectionFragment.onLog = new ConnectionFragment.OnEvent() {
             @Override
@@ -133,28 +141,15 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
         mSignal = (ImageView)findViewById(R.id.signal);
 
-        restartTimmer();
+        restartTimer();
     }
 
-    boolean doubleBackToExit_PressedOnce=false;
-    int doubleBackToExit_MaxTimeBetweenPresses=2000;//in milliseconds
+    OnBackKeyActions mOnBack = null;
+
     @Override
     public void onBackPressed() {
-
-        if (doubleBackToExit_PressedOnce) {
-            super.onBackPressed();
-            return;
-        }else {
-           doubleBackToExit_PressedOnce = true;
-        }
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() { doubleBackToExit_PressedOnce=false; }
-        }, doubleBackToExit_MaxTimeBetweenPresses);
+        mOnBack.onPress();
     }
-
-    Timer timer=null;
 
     private int DrawableID = -1;
     private int DrawableID_signal = R.drawable.ic_signal_cellular_off_black_24dp;
@@ -187,10 +182,15 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         });
     }
 
+    /**
+     * main application timer for sending messages
+     */
+    Timer timer=null;
+
     /*
      * starts /restart Fixed event
      */
-    public void restartTimmer() {
+    public void restartTimer() {
         if (timer != null)
             timer.cancel();
         timer = new Timer();
@@ -216,8 +216,9 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         }
     }
 
-
-
+    /*
+     * put string to user visible logs
+     */
     private void Log2List(String str) {
         mSectionsPagerAdapter.mLogFragment.Log2List(str);
     }
@@ -287,27 +288,44 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
     {
         if(position==mSelectedPage) return;
         mSelectedPage=position;
+        Log.d(Tabedctivity.class.getName(),"selected tab: "+position);
 
-        if(position==3) setFullScreenMode(true);
-        else            setFullScreenMode(false);
+        if(position==3) {
+            setFullScreenMode(true);
+            mOnBack.setCustomAction(
+                "Please click BACK again to exit full-screen mode",
+                new OnBackKeyActions.iActions() {
+                    @Override
+                    public void onDoublePress() {
+                        setFullScreenMode(false);
+                    }},
+                true);
+            Toast.makeText(getApplicationContext(),"Please click BACK twice to exit full-screen mode",Toast.LENGTH_SHORT).show();
+        }
+        else{
+            setFullScreenMode(false);
+        }
     }
 
     public void setFullScreenMode(boolean fullScreen)
     {
         android.support.v7.app.ActionBar ab=getSupportActionBar();
         Window window = getWindow();
+
         if(fullScreen) {
             mViewPager.setPagingEnabled(false);
             if(ab!=null) ab.hide();
             if(fab!=null) fab.hide();
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            mTabLayout.setVisibility(View.GONE);
         }else{
             mViewPager.setPagingEnabled(true);
             if(ab!=null) ab.show();
             if(fab!=null) fab.show();
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            mTabLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -348,7 +366,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             mConnectionFragment.onSave =new ConnectionFragment.OnEvent() {
                 @Override
                 public void run(String str) {
-                    restartTimmer();
+                    restartTimer();
                 }
             };
 

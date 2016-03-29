@@ -1,8 +1,11 @@
 package pl.dawidurbanski.tcpgamepad;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -21,10 +24,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
+import pl.dawidurbanski.tcpgamepad.ADdrone.MessageRetransmissionLogic;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
@@ -53,6 +54,8 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
     private ImageView mSignal = null;
 
+    private MessageRetransmissionLogic mMessageRetransmissionLogic = null;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_tabedctivity, menu);
@@ -76,7 +79,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             switch(item.getItemId())
             {
                 case R.id.menu_optical_latency_tester:
-                    OpticalLatencyTestFragment.popup(getSupportFragmentManager());
+                    startOpticalLatencyTest();
                 break;
                 case R.id.menu_about:
                     AboutFragment.popup(getSupportFragmentManager());
@@ -141,7 +144,47 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
         mSignal = (ImageView)findViewById(R.id.signal);
 
-        restartTimer();
+        //handle messages
+        mMessageRetransmissionLogic = new MessageRetransmissionLogic(new MessageRetransmissionLogic.iEvents() {
+            @Override
+            public void onTransmit(byte[] message) {
+                mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
+            }
+        });
+        //---
+    }
+
+    private void startOpticalLatencyTest() {
+
+        if (!mSectionsPagerAdapter.mConnectionFragment.isConnected()) {
+            new AlertDialog.Builder(Tabedctivity.this)
+            .setTitle(getString(R.string.app_name))
+            .setMessage(getString(R.string.error_mustBeConnect))
+            .setPositiveButton("OK", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+            return;
+        }
+
+        mMessageRetransmissionLogic.stop();
+
+        new AlertDialog.Builder(Tabedctivity.this)
+        .setTitle(getString(R.string.app_name))
+        .setMessage(getString(R.string.OpticalLatencyTestFragment_howto))
+        .setPositiveButton("START", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSectionsPagerAdapter.mConnectionFragment.connect();
+                //TODO: confirm connection
+                DialogFragment d = new OpticalLatencyTestFragment();
+                d.show(getSupportFragmentManager(), "OpticalLatencyTestFragment");
+            }
+        })
+        .setNegativeButton("CANCEL", null)
+        .setIcon(android.R.drawable.ic_dialog_info)
+        .show();
+
+        mMessageRetransmissionLogic.reset();
     }
 
     OnBackKeyActions mOnBack = null;
@@ -153,8 +196,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
     private int DrawableID = -1;
     private int DrawableID_signal = R.drawable.ic_signal_cellular_off_black_24dp;
-    private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus)
-    {
+    private void onConnectionStatusChange(ConnectionFragment.ConnectionStatus newStatus) {
         Log.v("ConnectionStatusChange",newStatus.toString());
 
         switch (newStatus)
@@ -183,40 +225,6 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
     }
 
     /**
-     * main application timer for sending messages
-     */
-    Timer timer=null;
-
-    /*
-     * starts /restart Fixed event
-     */
-    public void restartTimer() {
-        if (timer != null)
-            timer.cancel();
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                tick();
-            }
-        }, 0, Settings.getInstance().messageRetransmissionRate);
-    }
-
-    /*
-     * this will run on messageRetransmissionRate
-     */
-    private void tick() {
-        if(message==null)
-            return;
-
-        mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
-        if(--messageNum==0) {
-            Log2List("Move: timeout");
-            message = null;
-        }
-    }
-
-    /*
      * put string to user visible logs
      */
     private void Log2List(String str) {
@@ -245,29 +253,23 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         return super.onKeyUp(keyCode, event);
     }
 
-    private int messageNum =0;
-    private byte [] message = null;//if null no data will be sent
+    /**
+     * this queues message to be handled by MessageRetransmissionLogic
+     */
     @Override
     public void sendMessage(String name, float axis1, float axis2, float axis3, float axis4)
     {
-        messageNum = Settings.getInstance().messageRetransmissionNum;
-        boolean littleEndianByteOrder = Settings.getInstance().isEnableLittleEndianMessageByteOrder();
-        //this will drop messages. only one msg can be in queue
-        message = Message.generate(axis1, axis2, axis3, axis4, littleEndianByteOrder);
-
         String axisStr = ""
-                + String.format("%+.01f ", axis1)+ ","
-                + String.format("%+.01f ", axis2)+ " "
-                + String.format("%+.01f ", axis3)+ ","
-                + String.format("%+.01f ", axis4)+ " ";
-
-        String messageStr = Message.toHexString(message).replace("|", "|\n");
+            + String.format("%+.01f ", axis1)+ ","
+            + String.format("%+.01f ", axis2)+ " "
+            + String.format("%+.01f ", axis3)+ ","
+            + String.format("%+.01f ", axis4)+ " ";
 
         Log2List("Move: '"+name+"'" +
-                 axisStr + "\n"+
-                 " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec \n"+
-                 messageStr +"\n"+
-                 (littleEndianByteOrder ? "littleEndian" : "bigEndian" ) );
+            axisStr + "\n"+
+            " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec");
+
+        mMessageRetransmissionLogic.sendMessage(name,axis1,axis2,axis3,axis4);
     }
 
     @Override
@@ -366,7 +368,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             mConnectionFragment.onSave =new ConnectionFragment.OnEvent() {
                 @Override
                 public void run(String str) {
-                    restartTimer();
+                    mMessageRetransmissionLogic.reset();
                 }
             };
 

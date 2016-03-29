@@ -30,9 +30,22 @@ public class Message {
     */
     private static byte prefix  [] = {'$','$','$','$'};
 
-    /* commandManual ??
+    /*
+     commandManual ??
      */
-    private static short commandManual = 1000;
+    public enum Command {
+        TYPE_MANUAL(1000),
+        ERROR_NOINPUT(1001);
+
+        private final int value;
+        Command(int value) {
+            this.value = value;
+        }
+
+        public short toShort() {
+            return (short)value;
+        }
+    }
 
     /* solverModeStabilization ??
     */
@@ -73,7 +86,7 @@ public class Message {
     /*
      generate message as byte array
      */
-    static public byte [] generate(float roll, float pitch, float yaw, float throttle, boolean littleEndianByteOrder) {
+    static public byte [] generate(float roll, float pitch, float yaw, float throttle, Command command, boolean littleEndianByteOrder) {
 
         ByteBuffer ret = ByteBuffer.allocate(messageLen);
         if(littleEndianByteOrder) ret.order(ByteOrder.LITTLE_ENDIAN);
@@ -84,7 +97,7 @@ public class Message {
         ret.putFloat(pitch);              //  8-11 pitch
         ret.putFloat(yaw);                // 12-15 yaw
         ret.putFloat(throttle);           // 16-19 throttle
-        ret.putShort(commandManual);      // 20-21 commandManual
+        ret.putShort(command.toShort());  // 20-21 commandManual
         ret.put(solverModeStabilization); // 22
         ret.put(notInUse);                // 23-35
         ret.put(calculateCRC16(ret.array(), 4, 31));  //36-37 CRC calculated only from payload data

@@ -9,6 +9,7 @@
     <string name="error_invalid_adress">This adress is invalid</string>
     <string name="error_invalid_port">This port is too short</string>
     <string name="error_cantConnect">Cant connect</string>
+    <string name="error_mustBeConnect">Please connect first.</string>
     <string name="error_field_required">This field is required</string>
     <string name="action_connection">Connection</string>
     <string name="section_format">Hello World from section: %1$d</string>
@@ -40,4 +41,5 @@
     </string-array>
 
     <string name="OpticalLatencyTestFragment_prompt">Click to start</string>
+    <string name="OpticalLatencyTestFragment_howto">Please restart drone.</string>
 </resources>

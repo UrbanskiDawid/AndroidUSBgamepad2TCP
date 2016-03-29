@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +27,6 @@ import pl.dawidurbanski.tcpgamepad.R;
 public class OpticalLatencyTestFragment extends DialogFragment implements View.OnClickListener {
 
     private Message.ADdroneMessageInterface mListener = null;
-
-    public static void popup(FragmentManager fm /*getSupportFragmentManager*/) {
-        DialogFragment dialog = new OpticalLatencyTestFragment();
-        dialog.show(fm, "OpticalLatencyTestFragment");
-    }
 
     private TextView mTextView;
     private FrameLayout mFrame;

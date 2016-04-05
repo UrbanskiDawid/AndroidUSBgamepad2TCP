@@ -49,7 +49,7 @@ public class Message {
 
     /* solverModeStabilization ??
     */
-    private static byte solverModeStabilization = 10;
+    private static byte solverModeStabilization = 01;
 
     /* not in use part
     13 bytes. of 255
@@ -100,7 +100,7 @@ public class Message {
         ret.putShort(command.toShort());  // 20-21 commandManual
         ret.put(solverModeStabilization); // 22
         ret.put(notInUse);                // 23-35
-        ret.put(calculateCRC16(ret.array(), 4, 31));  //36-37 CRC calculated only from payload data
+        ret.put(calculateCRC16(ret.array(), 4, 36));  //36-37 CRC calculated only from payload data
 
         return ret.array();
     }

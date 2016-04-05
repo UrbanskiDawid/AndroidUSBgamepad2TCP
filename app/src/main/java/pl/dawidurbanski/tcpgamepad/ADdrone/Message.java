@@ -49,7 +49,7 @@ public class Message {
 
     /* solverModeStabilization ??
     */
-    private static byte solverModeStabilization = 01;
+    private static byte solverModeStabilization = 1;
 
     /* not in use part
     13 bytes. of 255

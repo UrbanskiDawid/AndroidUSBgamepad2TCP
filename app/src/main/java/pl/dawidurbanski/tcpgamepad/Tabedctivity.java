@@ -149,7 +149,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         mMessageRetransmissionLogic = new MessageRetransmissionLogic(new MessageRetransmissionLogic.iEvents() {
             @Override
             public void onTransmit(byte[] message) {
-                Log2List("outgoing: 0x"+Message.toHexString(message) );
+                Log2List("outgoing: 0x" + Message.toHexString(message));
                 mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
             }
         });

@@ -10,6 +10,7 @@
         android:id="@+id/logListView"
         android:padding="1dp"
         android:typeface="serif"
-        android:textSize="8dp" />
+        android:textSize="4sp"
+        style="@android:style/TextAppearance.DeviceDefault.Small.Inverse" />
 
 </FrameLayout>

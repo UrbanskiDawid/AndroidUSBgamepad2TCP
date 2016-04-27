@@ -69,15 +69,20 @@ public class MessageRetransmissionLogic implements Message.ADdroneMessageInterfa
      * this will run on messageRetransmissionRate
      */
     private void tick() {
-        if(mMessage ==null) {
-            mEvents.onTransmit(mTimeoutMessage);
+        if(mMessage==null) {
+            transmit(mTimeoutMessage);
             return;
         }
 
-        mEvents.onTransmit(mMessage);
+        transmit(mMessage);
         if(--mMessageRetransmissionNum==0) {
             mMessage = null;
         }
+    }
+
+    private void transmit(byte [] message) {
+        if(message!=null && message.length>1)
+        mEvents.onTransmit(message);
     }
 
     /**

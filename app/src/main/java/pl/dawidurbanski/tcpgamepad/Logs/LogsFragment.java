@@ -95,7 +95,7 @@ public class LogsFragment extends Fragment {
         mListView = (ListView)rootView.findViewById(R.id.logListView);
         if(mListView ==null) {   Log.e(LogsFragment.class.getName(), "cant find list!");}
 
-        mAdapter = new ArrayAdapter<>(rootView.getContext(),  android.R.layout.simple_list_item_1, mMyList);
+        mAdapter = new ArrayAdapter<>(rootView.getContext(),  R.layout.log_text, mMyList);
         mListView.setAdapter(mAdapter);
         return rootView;
     }

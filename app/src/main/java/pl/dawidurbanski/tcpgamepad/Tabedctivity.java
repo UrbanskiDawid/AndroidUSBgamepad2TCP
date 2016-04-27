@@ -32,6 +32,7 @@ import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.LatencyTest.OpticalLatencyTestFragment;
 import pl.dawidurbanski.tcpgamepad.Logs.LogsFragment;
 import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
+import pl.dawidurbanski.tcpgamepad.tools.CustomViewPager;
 import pl.dawidurbanski.tcpgamepad.tools.OnBackKeyActions;
 
 public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMessageInterface {
@@ -148,6 +149,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         mMessageRetransmissionLogic = new MessageRetransmissionLogic(new MessageRetransmissionLogic.iEvents() {
             @Override
             public void onTransmit(byte[] message) {
+                Log2List("outgoing: 0x"+Message.toHexString(message) );
                 mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
             }
         });
@@ -265,9 +267,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             + String.format("%+.01f ", axis3)+ ","
             + String.format("%+.01f ", axis4)+ " ";
 
-        Log2List("Move: '"+name+"'" +
-            axisStr + "\n"+
-            " re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec");
+        Log2List("Move: '"+name+"'" + axisStr + "; re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec");
 
         mMessageRetransmissionLogic.sendMessage(name,axis1,axis2,axis3,axis4);
     }
@@ -337,6 +337,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
      */
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        //BUG: this is not how you use FragmentMenager
         //Fragments
         public LogsFragment mLogFragment = LogsFragment.newInstance();
         public ConnectionFragment mConnectionFragment = ConnectionFragment.newInstance();
@@ -376,6 +377,13 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
                 @Override
                 public void change(ConnectionFragment.ConnectionStatus newStatus) {
                     onConnectionStatusChange(newStatus);
+                }
+            };
+
+            mConnectionFragment.onLog = new ConnectionFragment.OnEvent() {
+                @Override
+                public void run(String str) {
+                    Log2List("ConnectionFragment: "+str);
                 }
             };
         }

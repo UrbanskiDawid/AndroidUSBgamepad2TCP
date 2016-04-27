@@ -105,7 +105,7 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
             return;
         }
 
-        if(onMessage!=null) onMessage.run(str);
+        if(onMessage!=null) onMessage.run("incoming: "+str);
     }
 
     @Override

@@ -1,11 +1,9 @@
 package pl.dawidurbanski.tcpgamepad.Logs;
 
-import android.content.ContentValues;
+import android.app.Activity;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -14,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,42 +26,6 @@ import pl.dawidurbanski.tcpgamepad.R;
  * create an instance of this fragment.
  */
 public class LogsFragment extends Fragment {
-
-    public class ADdroidDB extends SQLiteOpenHelper {
-
-        public static final int DATABASE_VERSION = 1;
-
-        public static final String DATABASE_NAME = "ADdroid.db";
-
-        public static final String DATABASE_TABLE = "events";
-
-        public ADdroidDB(Context context) {
-
-            super(context, Environment.getExternalStorageDirectory() + File.separator +  DATABASE_NAME, null, DATABASE_VERSION);
-            Log.d("ADdroidDB",Environment.getExternalStorageDirectory() + File.separator +  DATABASE_NAME);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE "+DATABASE_TABLE+"( id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, event TEXT );");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS" + DATABASE_TABLE);
-            onCreate(db);
-        }
-        @Override
-        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            onUpgrade(db, oldVersion, newVersion);
-        }
-
-        public long insertEvent(String description) {
-            ContentValues newEvent = new ContentValues();
-            newEvent.put("event", description);
-            return getWritableDatabase().insert(ADdroidDB.DATABASE_TABLE, null, newEvent);
-        }
-    }
 
     private ADdroidDB mDatabase = null;
 
@@ -84,12 +44,20 @@ public class LogsFragment extends Fragment {
         return new LogsFragment();
     }
 
-    public void Log2List(final String str) {
-
+    private void logToDB(Context context,String str)
+    {
         if(mDatabase==null) {
-            mDatabase = new ADdroidDB(getContext());
+            try {
+                mDatabase = new ADdroidDB(context);
+            } catch (Exception e) {
+                Log.e("Log2List",e.getMessage());
+                return;
+            }
         }
         mDatabase.insertEvent(str);
+    }
+
+    public void Log2List(final String str) {
 
         FragmentActivity fa = getActivity();
         if(fa==null){
@@ -97,11 +65,13 @@ public class LogsFragment extends Fragment {
             return;
         }
 
+        logToDB(fa,str);
+
         fa.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
                 String dateTime =sdf.format(new Date());
 
                 mMyList.add(0, dateTime + ":" + str);
@@ -129,4 +99,21 @@ public class LogsFragment extends Fragment {
         mListView.setAdapter(mAdapter);
         return rootView;
     }
+
+    Context mContext=null;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext=context;
+
+        Activity activity = context instanceof Activity ? (Activity) context : null;
+        Log.d("A","onAttached"+activity);
+    }
+
+    @Override
+    public void onDestroy(){
+        Log.w(LogsFragment.class.getName(), "onDestroy");
+        super.onDestroy();
+    }
+
 }

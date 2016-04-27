@@ -1,4 +1,4 @@
-package pl.dawidurbanski.tcpgamepad;
+package pl.dawidurbanski.tcpgamepad.tools;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

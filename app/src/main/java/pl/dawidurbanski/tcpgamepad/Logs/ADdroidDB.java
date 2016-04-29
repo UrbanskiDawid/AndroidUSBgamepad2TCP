@@ -33,7 +33,7 @@ public class ADdroidDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE "+DATABASE_TABLE+"( id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, event TEXT );");
+        db.execSQL("CREATE TABLE "+DATABASE_TABLE+"( id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')), event TEXT );");
     }
 
     @Override

@@ -2,10 +2,9 @@ package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.util.Log;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -22,8 +21,8 @@ public class TCPclient {
 
     //Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
     //class at on asynckTask doInBackground
-    public interface OnMessageReceived { void messageReceived(String message);   }
-    private OnMessageReceived mMessageListener = null;
+    public interface OnMessageReceived { void messageReceived(byte [] message);   }
+    public OnMessageReceived mMessageListener = null;
 
     public interface OnEvent { void run(); }
     public OnEvent onConnected =null;
@@ -39,9 +38,7 @@ public class TCPclient {
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPclient(OnMessageReceived listener) {
-        mMessageListener = listener;
-    }
+    public TCPclient() { }
 
     /**
      * Sends the message entered by client to the server
@@ -110,17 +107,16 @@ public class TCPclient {
 
             try {
                 mBufferOut = new DataOutputStream( socket.getOutputStream() );
-
-                //Read loop
-                BufferedReader mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String receivedMessage;// message to send to the server
-                while (mRun)
+                DataInputStream mDataInputStream = new DataInputStream(socket.getInputStream());
+                byte [] buffer = new byte[255];
+                int numOfBytes = 0;
+                while(mRun)
                 {
-                    receivedMessage = mBufferIn.readLine();
-                    if (receivedMessage != null && mMessageListener != null)
-                    { mMessageListener.messageReceived(receivedMessage); }//call the method messageReceived from MyActivity class
+                    numOfBytes = mDataInputStream.read(buffer);
+                    if(numOfBytes>0 && mMessageListener != null) {
+                        mMessageListener.messageReceived(buffer); //call the method messageReceived from MyActivity class
+                    }
                 }
-                //---
 
             } catch (Exception e) {
                 if(mRun!=false) {

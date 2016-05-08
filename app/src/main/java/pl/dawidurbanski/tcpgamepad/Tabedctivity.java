@@ -27,6 +27,7 @@ import android.widget.Toast;
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.ADdrone.MessageRetransmissionLogic;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
+import pl.dawidurbanski.tcpgamepad.Connection.TCPclient;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
 import pl.dawidurbanski.tcpgamepad.LatencyTest.OpticalLatencyTestFragment;
@@ -398,6 +399,13 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
                 @Override
                 public void run(String str) {
                     Log2List("ConnectionFragment: "+str);
+                }
+            };
+
+            mConnectionFragment.onNewMessage = new TCPclient.OnMessageReceived() {
+                @Override
+                public void messageReceived(byte[] message) {
+                    Log2List("incoming: 0x"+Message.toHexString(message));
                 }
             };
         }

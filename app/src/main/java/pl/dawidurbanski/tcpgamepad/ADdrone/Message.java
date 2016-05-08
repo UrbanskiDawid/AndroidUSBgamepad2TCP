@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
+import pl.dawidurbanski.tcpgamepad.ByteHelpers;
 import pl.dawidurbanski.tcpgamepad.Settings;
 
 
@@ -13,7 +14,7 @@ import pl.dawidurbanski.tcpgamepad.Settings;
  *
  * 38 bytes long message:
  * BYTE:    0  1  2  3 |  4  5  6  7 |  8  9 10 11 | 12 13 14 15 | 16 17 18 19 | 20 21 | 22  | 23 24 25 26 27 28 29 30 31 32 33 34 35 | 36 37
- * VALUE:     prefix   |     roll    |    pitch    |     yaw     |   throttle  |  cmd  | SMS |      not in use                        |  CRC
+ * VALUE:     preamble   |     roll    |    pitch    |     yaw     |   throttle  |  cmd  | SMS |      not in use                        |  CRC
  */
 public class Message {
 
@@ -29,8 +30,9 @@ public class Message {
     Length of message in bytes.
      */
     private static int messageLen = 38;
+    public static int getLen(){ return messageLen; }
 
-    /* Message prefix four of:
+    /* Message preamble four of:
     Bin         Dec Hex Char
     0010 0100	36	24	$
     */
@@ -106,7 +108,7 @@ public class Message {
         if(littleEndianByteOrder) ret.order(ByteOrder.LITTLE_ENDIAN);
         else                      ret.order(ByteOrder.BIG_ENDIAN);
 
-        ret.put(prefix);                  //  0- 3 prefix
+        ret.put(prefix);                  //  0- 3 preamble
         ret.putFloat(roll);               //  4- 7 roll
         ret.putFloat(pitch);              //  8-11 pitch
         ret.putFloat(yaw);                // 12-15 yaw
@@ -145,8 +147,7 @@ public class Message {
     static public String byteArrayAsInts(byte [] message,int from,int to) {
         String ret = "";
         for(int i=from;i<to;i++){
-            int I = ((int) message[i] & 0xFF);
-            ret += "" + String.format("%03d", I) + ",";
+            ret += ByteHelpers.byteToIntString(message[i]) + ",";
         }
         if(ret.endsWith(","))  ret=ret.substring(0,ret.length()-1);//remove last ','
         return ret;
@@ -157,7 +158,7 @@ public class Message {
      */
     static public String toStringAsInts(byte [] message)   {
         if(message.length!=messageLen) return"";
-        return  byteArrayAsInts(message, 0, 4)//prefix
+        return  byteArrayAsInts(message, 0, 4)//preamble
           +"|"+ byteArrayAsInts(message, 4, 8)//roll
           +"|"+ byteArrayAsInts(message, 8,12)//pitch
           +"|"+ byteArrayAsInts(message,12,16)//yaw

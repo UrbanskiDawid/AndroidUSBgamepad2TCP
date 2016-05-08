@@ -1,6 +1,7 @@
 package pl.dawidurbanski.tcpgamepad.Connection;
 
 import android.os.AsyncTask;
+import android.os.Message;
 import android.util.Log;
 
 /**
@@ -15,8 +16,7 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
     public OnEvent
             onConnected = null,
             onEnd = null,
-            onFail = null,
-            onMessage = null;
+            onFail = null;
 
     private Watchdog connectionWatchdog;
     private int watchdogPatienceMS = 10*1000;//how long will dog wait for food
@@ -27,16 +27,18 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
     private String mAdress;
     private int mPort;
 
-    public TCPconnectionTask(String adress,int port) {
+    public TCPconnectionTask(String adress,int port,final TCPclient.OnMessageReceived messageHandler) {
         mIsConnected=false;
         mAdress=adress;
         mPort=port;
-        tcPclient = new TCPclient(new TCPclient.OnMessageReceived() {
+        tcPclient = new TCPclient();
+        tcPclient.mMessageListener= new TCPclient.OnMessageReceived() {
             @Override
-            public void messageReceived(String message) {
-                message(message);
+            public void messageReceived(byte [] msg) {
+                connectionWatchdog.feed();
+                messageHandler.messageReceived(msg);
             }
-        });
+        };
         tcPclient.onConnected=new TCPclient.OnEvent() {
             @Override
             public void run() {
@@ -96,17 +98,6 @@ public class TCPconnectionTask extends AsyncTask<Void, Void, Boolean> {
 
     private void end(String str)    { if(onEnd!=null)     onEnd.run(str);     }
     private void fail(String str)   { if(onFail!=null)    onFail.run(str);    }
-    private void message(String str)
-    {
-        str = str.trim();
-        if(str.startsWith("tick")) {
-            Log.d(this.getClass().getName(),"message('tick') feeding connectionWatchdog.");
-            connectionWatchdog.feed();
-            return;
-        }
-
-        if(onMessage!=null) onMessage.run("incoming: "+str);
-    }
 
     @Override
     protected void onCancelled() {

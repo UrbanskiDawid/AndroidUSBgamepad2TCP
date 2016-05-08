@@ -19,6 +19,9 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import pl.dawidurbanski.tcpgamepad.ByteHelpers;
+import pl.dawidurbanski.tcpgamepad.ADdrone.DebugData;
 import pl.dawidurbanski.tcpgamepad.R;
 import pl.dawidurbanski.tcpgamepad.Settings;
 
@@ -29,7 +32,7 @@ import pl.dawidurbanski.tcpgamepad.Settings;
  * Use the {@link ConnectionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ConnectionFragment extends Fragment{
+public class ConnectionFragment extends Fragment {
 
     // UI references.
     private AutoCompleteTextView mAddressView = null;
@@ -40,11 +43,17 @@ public class ConnectionFragment extends Fragment{
 
     TCPconnectionTask mTCPconnectionTask = null;
 
+    long mConnectionPing = 9999;
+
     private Switch mSwitch = null;
+
+    private PingPong mPingPong = null;
 
     public interface OnEvent { void run(String str);   }
     public OnEvent onLog=null,
                    onSave=null;
+
+    public TCPclient.OnMessageReceived onNewMessage=null;
 
     public interface OnConnectionStatusEvent { void change(ConnectionStatus newStatus);   }
     public OnConnectionStatusEvent onConnectionStatusChange=null;
@@ -100,6 +109,14 @@ public class ConnectionFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //ping pong
+        mPingPong = new PingPong(new PingPong.OnEvent() {
+            @Override
+            public void send(byte[] msg) { sendBytes(msg);  }
+            @Override
+            public void onResponse(long deltaMS) { mConnectionPing=deltaMS; }
+        });
     }
 
     @Override
@@ -181,26 +198,56 @@ public class ConnectionFragment extends Fragment{
         mTCPconnectionTask.tcPclient.stop();
     }
 
+    ArrayList<Byte> incomingBytes = new ArrayList<>();
+    int readAhead=0;
+    private void readIncomingBytes(byte[] in){
+        for(byte b:in) {
+            incomingBytes.add(b);
+            if(readAhead==0) {
+                if (incomingBytes.size() >= 4) {
+                    if (ByteHelpers.ByteArrayStartsWith(incomingBytes,DebugData.preamble)) {
+                        readAhead = DebugData.messageLen-4;
+                    } else if (ByteHelpers.ByteArrayStartsWith(incomingBytes,PingPong.preamble)) {
+                        readAhead = PingPong.messageLen-4;
+                    } else {
+                        incomingBytes.clear();
+                        Log.d("ConnectionFragment", "skipping: "+incomingBytes.toString());
+                    }
+                }
+            }else{
+                readAhead--;
+                if(readAhead==0)
+                {
+                    byte [] arr = new byte[incomingBytes.size()];
+                    for(int i=0;i<arr.length;i++)
+                        arr[i]=incomingBytes.get(i);
+
+                    getBytes(arr);
+                    incomingBytes.clear();
+                }
+            }
+        }
+    }
+
+
     public void connect() {
 
         updateConnectionStatus(ConnectionStatus.connecting);
 
-        String address = Settings.getInstance().address;
+        final String address = Settings.getInstance().address;
         int port = Settings.getInstance().port;
 
         if (mTCPconnectionTask != null) {
-            Log("cant connect conection is active");
+            Log("can't connect, connection is active!");
             return;
         }
-
         Log("connecting to "+address+":"+port);
-        mTCPconnectionTask = new TCPconnectionTask(address,port);
-        mTCPconnectionTask.onMessage= new TCPconnectionTask.OnEvent() {
+        mTCPconnectionTask = new TCPconnectionTask(address, port, new TCPclient.OnMessageReceived() {
             @Override
-            public void run(String str) {
-                Log("incoming:"+str);
+            public void messageReceived(byte[] in) {
+                readIncomingBytes(in);
             }
-        };
+        });
         mTCPconnectionTask.onConnected=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String str) {
@@ -232,6 +279,22 @@ public class ConnectionFragment extends Fragment{
         try {   mTCPconnectionTask.tcPclient.sendBytes(myByteArray);
         }catch (Exception e){return false;}
         return true;
+    }
+
+    private void getBytes(byte[] in) {
+        if(in.length<4) return;
+
+        if (in.length == DebugData.messageLen) {
+            if(onNewMessage!=null) onNewMessage.messageReceived(in);
+            return;
+        }
+
+        if (in.length == PingPong.messageLen) {
+            mPingPong.HandleIncoming(in);//NOTE: can trigger onResponse EVENT
+            return;
+        }
+
+        Log("unknown bytes received: '"+in.toString()+"'");
     }
 
     private void onDataFilled()  {

@@ -26,7 +26,7 @@ import pl.dawidurbanski.tcpgamepad.R;
  */
 public class OpticalLatencyTestFragment extends DialogFragment implements View.OnClickListener {
 
-    private Message.ADdroneMessageInterface mListener = null;
+    private Message.OnNewInput mListener = null;
 
     private TextView mTextView;
     private FrameLayout mFrame;
@@ -35,9 +35,9 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (Message.ADdroneMessageInterface) activity;
+            mListener = (Message.OnNewInput) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement '" + Message.ADdroneMessageInterface.class.getName() + "'");
+            throw new ClassCastException(activity.toString() + " must implement '" + Message.OnNewInput.class.getName() + "'");
         }
     }
 
@@ -143,7 +143,7 @@ public class OpticalLatencyTestFragment extends DialogFragment implements View.O
         {
             Log.d("OpticalLatencyTest","sending message");
             setText("GO",Color.BLACK,Color.GREEN);
-            mListener.sendMessage("test",0.0f,0.0f,0.0f,0.0f);
+            mListener.onNewMessage("test",0.0f,0.0f,0.0f,0.0f);
         }
         if(tickCount >= tickCountMax+tickCooldown)
         {

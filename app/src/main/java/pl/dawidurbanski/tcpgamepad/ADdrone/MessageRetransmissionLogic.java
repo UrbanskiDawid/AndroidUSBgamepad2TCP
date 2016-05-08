@@ -8,16 +8,32 @@ import pl.dawidurbanski.tcpgamepad.Settings;
 /**
  * Created by dawid on 28.03.2016.
  */
-public class MessageRetransmissionLogic implements Message.ADdroneMessageInterface {
+public class MessageRetransmissionLogic implements Message.OnNewInput {
 
-    public MessageRetransmissionLogic(iEvents events) {
+    public MessageRetransmissionLogic(OnRetransmissionEvent events) {
         mEvents = events;
         reset();
     }
 
-    public interface iEvents{ void onTransmit(byte [] message); }
+    /*
+     events reported by 'MessageRetransmissionLogic'
+     */
+    public interface OnRetransmissionEvent {
 
-    private iEvents mEvents;
+        /*
+        queued message is transited accordingly to 'Settings.getInstance().messageRetransmissionRate'
+         */
+        void onTransmitMessage(byte [] message);
+
+        /*
+        retransmission has ended  due to:
+        * no input in 'Settings.getInstance().messageRetransmissionRate'
+        after this 'mTimeoutMessage' will be retransmitted
+         */
+        void onRetransmissionEnded(byte [] message);
+    }
+
+    private OnRetransmissionEvent mEvents;
 
     /**
      *  number of retransmissions left
@@ -75,24 +91,30 @@ public class MessageRetransmissionLogic implements Message.ADdroneMessageInterfa
         }
 
         transmit(mMessage);
+
         if(--mMessageRetransmissionNum==0) {
+            mEvents.onRetransmissionEnded(mMessage);
             mMessage = null;
         }
     }
 
+    /**
+     * report that message should be transmited
+     * @param message
+     */
     private void transmit(byte [] message) {
         if(message!=null && message.length>1)
-        mEvents.onTransmit(message);
+        mEvents.onTransmitMessage(message);
     }
 
     /**
      * this will drop messages. only one msg can be in queue at the moment
      */
     @Override
-    public void sendMessage(String name, float axis1, float axis2, float axis3, float axis4)
+    public void onNewMessage(String name, float axis1, float axis2, float axis3, float axis4)
     {
         mMessageRetransmissionNum = Settings.getInstance().messageRetransmissionNum;
         boolean littleEndianByteOrder = Settings.getInstance().isEnableLittleEndianMessageByteOrder();
-        mMessage = Message.generate(axis1, axis2, axis3, axis4, Message.Command.TYPE_MANUAL, littleEndianByteOrder);
+        mMessage = Message.generate(axis1, axis2, axis3, axis4, Message.Command.MANUAL, littleEndianByteOrder);
     }
 }

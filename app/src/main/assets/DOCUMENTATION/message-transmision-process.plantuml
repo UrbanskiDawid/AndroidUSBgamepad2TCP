@@ -1,0 +1,38 @@
+@startuml
+title message transmision process
+
+package "New input" {
+[GamePad] <<GamePadFragment.java>>
+[VirtualGamePad] <<VirtualGamePadFragment.java>>
+[OpticalLatencyTestFragment]<<OpticalLatencyTestFragment.java>>
+[FloatingActionButton] <<Tabedctivity.java>>
+}
+
+package "Retransmission" {
+[onNewMessage()]<<Tabedctivity.java>> #Yellow
+cloud {
+  [RetransmissionLogic] <<MessageRetransmissionLogic.java>>
+}
+[onTransmitMessage()]<<Tabedctivity.java>> #Yellow
+}
+
+package "IP" {
+[sendBytes()] <<ConnectionFragment.java>> #Yellow
+}
+
+note bottom  of [sendBytes()]
+  calls:
+  sendBytes() TCPclient.java -> mBufferOut.write()
+end note
+
+[FloatingActionButton] -down-> [onNewMessage()] : stop
+[GamePad] -down-> [onNewMessage()]
+[VirtualGamePad] -down-> [onNewMessage()]
+[OpticalLatencyTestFragment] -down-> [onNewMessage()]
+
+[onNewMessage()] -down-> [RetransmissionLogic]
+
+[RetransmissionLogic] -down-> [onTransmitMessage()]
+[onTransmitMessage()] -down-> [sendBytes()]
+
+@enduml

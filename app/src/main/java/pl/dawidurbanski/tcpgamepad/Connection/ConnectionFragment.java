@@ -38,7 +38,7 @@ public class ConnectionFragment extends Fragment{
             mTransmissionSec = null,
             mRetransmissionRate = null;
 
-    TCPconnectionTask mAuthTask = null;
+    TCPconnectionTask mTCPconnectionTask = null;
 
     private Switch mSwitch = null;
 
@@ -171,14 +171,14 @@ public class ConnectionFragment extends Fragment{
     }
 
     public boolean isConnected()    {
-        return  ( mAuthTask!=null && mAuthTask.isIsConnected());
+        return  ( mTCPconnectionTask !=null && mTCPconnectionTask.isIsConnected());
     }
 
     public void disconnect() {
         updateConnectionStatus(ConnectionStatus.disconnected);
         if(!isConnected()) return;
         Log("disconnecting!");
-        mAuthTask.tcPclient.stop();
+        mTCPconnectionTask.tcPclient.stop();
     }
 
     public void connect() {
@@ -188,47 +188,48 @@ public class ConnectionFragment extends Fragment{
         String address = Settings.getInstance().address;
         int port = Settings.getInstance().port;
 
-        if (mAuthTask != null) {
+        if (mTCPconnectionTask != null) {
             Log("cant connect conection is active");
             return;
         }
 
         Log("connecting to "+address+":"+port);
-        mAuthTask = new TCPconnectionTask(address,port);
-        mAuthTask.onMessage= new TCPconnectionTask.OnEvent() {
+        mTCPconnectionTask = new TCPconnectionTask(address,port);
+        mTCPconnectionTask.onMessage= new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String str) {
                 Log("incoming:"+str);
             }
         };
-        mAuthTask.onConnected=new TCPconnectionTask.OnEvent() {
+        mTCPconnectionTask.onConnected=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String str) {
                 Log("connected!");
                 updateConnectionStatus(ConnectionStatus.connected);
             }
         };
-        mAuthTask.onEnd=new TCPconnectionTask.OnEvent() {
+        mTCPconnectionTask.onEnd=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String msg) {
             Log("connection end " + msg);
-            mAuthTask.cancel(true) ;mAuthTask = null;
+            mTCPconnectionTask.cancel(true) ;
+                mTCPconnectionTask = null;
             updateConnectionStatus(ConnectionStatus.disconnected);
             }
         };
-        mAuthTask.onFail=new TCPconnectionTask.OnEvent() {
+        mTCPconnectionTask.onFail=new TCPconnectionTask.OnEvent() {
             @Override
             public void run(String msg) {
             Log("connection fail " + msg);
             updateConnectionStatus(ConnectionStatus.error);
             }
         };
-        mAuthTask.execute((Void) null);
+        mTCPconnectionTask.execute((Void) null);
     }
 
     public boolean sendBytes(byte[] myByteArray) {
         if(!isConnected()) return false;
-        try {   mAuthTask.tcPclient.sendBytes(myByteArray);
+        try {   mTCPconnectionTask.tcPclient.sendBytes(myByteArray);
         }catch (Exception e){return false;}
         return true;
     }

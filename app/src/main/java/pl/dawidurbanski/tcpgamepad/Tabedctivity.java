@@ -35,7 +35,7 @@ import pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadFragment;
 import pl.dawidurbanski.tcpgamepad.tools.CustomViewPager;
 import pl.dawidurbanski.tcpgamepad.tools.OnBackKeyActions;
 
-public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMessageInterface {
+public class Tabedctivity extends AppCompatActivity implements Message.OnNewInput,MessageRetransmissionLogic.OnRetransmissionEvent {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -135,6 +135,9 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             @Override
             public void onClick(View view) {
             if(mSectionsPagerAdapter.mConnectionFragment.isConnected()) {
+                mMessageRetransmissionLogic.reset();
+                byte [] stopMessage = Message.generate(0,0,0,0, Message.Command.STOP, Settings.getInstance().isEnableLittleEndianMessageByteOrder());
+                onTransmitMessage(stopMessage);
                 mSectionsPagerAdapter.mConnectionFragment.disconnect();
             }else{
                 mSectionsPagerAdapter.mConnectionFragment.connect();
@@ -146,14 +149,25 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         mSignal = (ImageView)findViewById(R.id.signal);
 
         //handle messages
-        mMessageRetransmissionLogic = new MessageRetransmissionLogic(new MessageRetransmissionLogic.iEvents() {
-            @Override
-            public void onTransmit(byte[] message) {
-                Log2List("outgoing: 0x" + Message.toHexString(message));
-                mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
-            }
-        });
+        mMessageRetransmissionLogic = new MessageRetransmissionLogic(this);
         //---
+    }
+
+    @Override
+    public void onTransmitMessage(byte[] message) {
+
+        if(!mSectionsPagerAdapter.mConnectionFragment.isConnected()) {
+            //skip notConnected
+            return;
+        }
+
+        Log2List("outgoing: 0x" + Message.toHexString(message));
+        mSectionsPagerAdapter.mConnectionFragment.sendBytes(message);
+    }
+
+    @Override
+    public void onRetransmissionEnded(byte[] message) {
+        Log2List("retransmission ended: no new input");
     }
 
     private void startOpticalLatencyTest() {
@@ -177,7 +191,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mSectionsPagerAdapter.mConnectionFragment.connect();
-                //TODO: confirm connection
+                //*TODO: confirm connection
                 DialogFragment d = new OpticalLatencyTestFragment();
                 d.show(getSupportFragmentManager(), "OpticalLatencyTestFragment");
             }
@@ -259,7 +273,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
      * this queues message to be handled by MessageRetransmissionLogic
      */
     @Override
-    public void sendMessage(String name, float axis1, float axis2, float axis3, float axis4)
+    public void onNewMessage(String name, float axis1, float axis2, float axis3, float axis4)
     {
         String axisStr = ""
             + String.format("%+.01f ", axis1)+ ","
@@ -269,7 +283,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
 
         Log2List("Move: '"+name+"'" + axisStr + "; re-transmission"+Settings.getInstance().getMessageRetransmissionTimeInSec()+"sec");
 
-        mMessageRetransmissionLogic.sendMessage(name,axis1,axis2,axis3,axis4);
+        mMessageRetransmissionLogic.onNewMessage(name,axis1,axis2,axis3,axis4);
     }
 
     @Override
@@ -277,7 +291,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
         GamePadInput.GamePadAxis axis = mSectionsPagerAdapter.mGamePadFragment.onGenericMotionEvent(event);
         if(axis!=null)
         {
-            sendMessage("gamePad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
+            onNewMessage("gamePad", axis.leftControleStickX, axis.leftControleStickY, axis.rightControleStickX, axis.rightControleStickY);
             return true;
         }
         return super.onGenericMotionEvent(event);
@@ -362,7 +376,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.ADdroneMe
                 public void onMove(float x, float y, float a, float b) {
                     // throttle is value form 0 to 1
                     float throttle = (b + 1.0f) / 2.0f;
-                    sendMessage("virtual",x,y,a,throttle);
+                    onNewMessage("virtual",x,y,a,throttle);
                 }
             };
 

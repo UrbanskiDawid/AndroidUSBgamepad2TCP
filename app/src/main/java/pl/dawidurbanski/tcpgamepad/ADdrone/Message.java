@@ -5,6 +5,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
+import pl.dawidurbanski.tcpgamepad.Settings;
+
 
 /**
  * Created by Dawid on 24.01.2016.
@@ -15,8 +17,12 @@ import java.util.List;
  */
 public class Message {
 
-    public interface ADdroneMessageInterface {
-        void sendMessage(String name, float axis1, float axis2, float axis3, float axis4);
+    public interface OnNewInput {
+        /*
+        name - input source name
+        axis1..4 - axis values
+         */
+        void onNewMessage(String sourceName, float axis1, float axis2, float axis3, float axis4);
     }
 
     /*
@@ -31,11 +37,17 @@ public class Message {
     private static byte prefix  [] = {'$','$','$','$'};
 
     /*
-     commandManual ??
+     command
+     * MANUAL (=1000) - normalna praca, skutek kontroler będzie realizował zadane wartości katów i przepustnicy zgodnie z ControlData
+     * STOP (=2000) - skutek: bezwzględne zatrzymanie (natychmiastowe wyłączenie silników bez wzgledu na stan)
+     * ERROR_CONNECTION (=6100) - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze coś się stało złego z komunikacją)
+     * ERROR_NOINPUT (=??), - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze nie ma wiecej poleceń sterowania
      */
     public enum Command {
-        TYPE_MANUAL(1000),
-        ERROR_NOINPUT(1001);
+        MANUAL(1000),
+        STOP(2000),
+        ERROR_NOINPUT(6100),//TODO: missing value (current=ERROR_CONNECTION)
+        ERROR_CONNECTION(6100);
 
         private final int value;
         Command(int value) {
@@ -47,8 +59,9 @@ public class Message {
         }
     }
 
-    /* solverModeStabilization ??
-    */
+    /* solverModeStabilization
+     * default: 1
+     */
     private static byte solverModeStabilization = 1;
 
     /* not in use part
@@ -65,7 +78,8 @@ public class Message {
     /*
     Calculate CRC for given array 2bytes
      */
-    public static byte[] calculateCRC16(byte[] buff, int start, int end) {
+    public static byte[] calculateCRC16(byte[] buff, int start, int end)
+    {
         int crcShort = 0;
         for (int i = start; i < end; i++) {
             crcShort = ((crcShort  >>> 8) | (crcShort  << 8) )& 0xffff;
@@ -86,8 +100,8 @@ public class Message {
     /*
      generate message as byte array
      */
-    static public byte [] generate(float roll, float pitch, float yaw, float throttle, Command command, boolean littleEndianByteOrder) {
-
+    static public byte [] generate(float roll, float pitch, float yaw, float throttle, Command command, boolean littleEndianByteOrder)
+    {
         ByteBuffer ret = ByteBuffer.allocate(messageLen);
         if(littleEndianByteOrder) ret.order(ByteOrder.LITTLE_ENDIAN);
         else                      ret.order(ByteOrder.BIG_ENDIAN);
@@ -97,7 +111,7 @@ public class Message {
         ret.putFloat(pitch);              //  8-11 pitch
         ret.putFloat(yaw);                // 12-15 yaw
         ret.putFloat(throttle);           // 16-19 throttle
-        ret.putShort(command.toShort());  // 20-21 commandManual
+        ret.putShort(command.toShort());  // 20-21 command
         ret.put(solverModeStabilization); // 22
         ret.put(notInUse);                // 23-35
         ret.put(calculateCRC16(ret.array(), 4, 36));  //36-37 CRC calculated only from payload data
@@ -107,7 +121,6 @@ public class Message {
 
     /*
      24242424|00000000|00000000|00000000|0040103c|e803|0a|ffffffffffffffffffffffffff|27a5
-     24242424|00000000|00000000|00000000|3c104000|03e8|0a|ffffffffffffffffffffffffff|a527
      */
     static public String toHexString(byte [] arr)
     {

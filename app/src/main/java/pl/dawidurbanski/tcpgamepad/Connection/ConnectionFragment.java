@@ -3,6 +3,7 @@ package pl.dawidurbanski.tcpgamepad.Connection;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -43,17 +44,15 @@ public class ConnectionFragment extends Fragment {
 
     TCPconnectionTask mTCPconnectionTask = null;
 
-    long mConnectionPing = 9999;
-
     private Switch mSwitch = null;
-
-    private PingPong mPingPong = null;
 
     public interface OnEvent { void run(String str);   }
     public OnEvent onLog=null,
                    onSave=null;
 
-    public TCPclient.OnMessageReceived onNewMessage=null;
+    public TCPclient.OnMessageReceived
+            onNewMessage=null,
+            onNewPong=null;
 
     public interface OnConnectionStatusEvent { void change(ConnectionStatus newStatus);   }
     public OnConnectionStatusEvent onConnectionStatusChange=null;
@@ -109,14 +108,6 @@ public class ConnectionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //ping pong
-        mPingPong = new PingPong(new PingPong.OnEvent() {
-            @Override
-            public void send(byte[] msg) { sendBytes(msg);  }
-            @Override
-            public void onResponse(long deltaMS) { mConnectionPing=deltaMS; }
-        });
     }
 
     @Override
@@ -198,35 +189,43 @@ public class ConnectionFragment extends Fragment {
         mTCPconnectionTask.tcPclient.stop();
     }
 
-    ArrayList<Byte> incomingBytes = new ArrayList<>();
-    int readAhead=0;
+
+
     private void readIncomingBytes(byte[] in){
+
+        //Log.d("ConnectionF","in: 0x"+ByteHelpers.ByteArrayToHexString(in));
+        ArrayList<Byte> incomingBytes = new ArrayList<>();
+        int readAhead=0;
         for(byte b:in) {
             incomingBytes.add(b);
             if(readAhead==0) {
-                if (incomingBytes.size() >= 4) {
+                if (incomingBytes.size() == 4) {
                     if (ByteHelpers.ByteArrayStartsWith(incomingBytes,DebugData.preamble)) {
+                        //Log.d("ConnectionFragment", "reading DebugData "+DebugData.messageLen+"bytes");
                         readAhead = DebugData.messageLen-4;
                     } else if (ByteHelpers.ByteArrayStartsWith(incomingBytes,PingPong.preamble)) {
+                        //Log.d("ConnectionFragment", "reading PingPong "+PingPong.messageLen+"bytes");
                         readAhead = PingPong.messageLen-4;
                     } else {
+                        //Log.d("ConnectionFragment", "skipping: "+incomingBytes.size()+"bytes: "+incomingBytes.toString());
                         incomingBytes.clear();
-                        Log.d("ConnectionFragment", "skipping: "+incomingBytes.toString());
                     }
                 }
             }else{
                 readAhead--;
-                if(readAhead==0)
+                if(readAhead<=0)
                 {
+                    readAhead=0;
                     byte [] arr = new byte[incomingBytes.size()];
-                    for(int i=0;i<arr.length;i++)
-                        arr[i]=incomingBytes.get(i);
-
+                    for(int j=0;j<arr.length;j++)  arr[j]=incomingBytes.get(j);
                     getBytes(arr);
+
+                    //Log.d("ConnectionFragment", "found: "+incomingBytes.size()+"bytes: "+incomingBytes.toString());
                     incomingBytes.clear();
                 }
             }
         }
+        incomingBytes.clear();
     }
 
 
@@ -290,7 +289,7 @@ public class ConnectionFragment extends Fragment {
         }
 
         if (in.length == PingPong.messageLen) {
-            mPingPong.HandleIncoming(in);//NOTE: can trigger onResponse EVENT
+            if(onNewPong!=null)  onNewPong.messageReceived(in);
             return;
         }
 

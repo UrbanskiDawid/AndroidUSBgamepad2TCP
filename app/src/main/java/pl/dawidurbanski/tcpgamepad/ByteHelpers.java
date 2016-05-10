@@ -16,11 +16,11 @@ public class ByteHelpers {
     }
 
     public static String byteToHexString(byte b) {
-        String ret="";
+        String ret = "";
         int intVal = b & 0xff;
         if (intVal < 0x10) ret += "0";
         ret += Integer.toHexString(intVal);
-        return  ret;
+        return ret;
     }
 
     public static String byteToIntString(byte b) {
@@ -28,12 +28,19 @@ public class ByteHelpers {
         return String.format("%03d", I);
     }
 
-    public static boolean ByteArrayStartsWith(ArrayList<Byte> ar, byte [] prefix){
-        for(int i=0;i<prefix.length;i++){
-            if(ar.get(i)!=prefix[i])
+    public static boolean ByteArrayStartsWith(ArrayList<Byte> ar, byte[] prefix) {
+        if(prefix.length < prefix.length) return false;
+        for (int i = 0; i < prefix.length; i++) {
+            if (ar.get(i) != prefix[i])
                 return false;
         }
         return true;
+    }
+
+    public static String ByteArrayToHexString(byte[] in) {
+        String ret="";
+        for(byte b:in) { ret+=byteToHexString(b); }
+        return ret;
     }
 
     public static String ByteToBinString(byte b) {

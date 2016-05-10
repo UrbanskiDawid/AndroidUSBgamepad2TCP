@@ -1,5 +1,7 @@
 package pl.dawidurbanski.tcpgamepad.Connection;
 
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
+import pl.dawidurbanski.tcpgamepad.ByteHelpers;
 
 /**
  * Created by dawid on 08.05.2016.
@@ -27,11 +30,13 @@ public class PingPong {
     }
     private OnEvent mEvents = null;
 
-    public PingPong(OnEvent events) {
+    public PingPong(int interval, OnEvent events) {
+        mInterval = interval;
         mTimer = new Timer();
+        Log.e("PingPong","created interval:"+interval);
         mTimer.scheduleAtFixedRate( new TimerTask() {
             @Override
-            public void run() { pingPongTick(); }
+            public void run() {tick(); }
         }, 0, mInterval);
         mEvents = events;
     }
@@ -63,25 +68,28 @@ public class PingPong {
 
     private static int counter = 0;
     private ByteBuffer buffer = ByteBuffer.allocate(messageLen);//preamble 4B, integer 4B, CRC 2B
-    private void pingPongTick() {
+    private void tick() {
 
         if(PingPong.counter==Integer.MAX_VALUE) PingPong.counter=0;
         PingPong.counter++;
 
         buffer.clear();
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.order(ByteOrder.BIG_ENDIAN);
 
         buffer.put(PingPong.preamble);                  //  0-3 preamble
         buffer.putInt(PingPong.counter);              //  4-7 counter
 
-        byte [] CRC = Message.calculateCRC16(buffer.array(),0,8);
+        byte [] CRC = Message.calculateCRC16(buffer.array(),0,messageLen);
         buffer.put(CRC);
 
         mMemory.add( new idAndDataTime(PingPong.counter) );//remember
         if(mMemory.size()>PingPong.mMemoryMaxSize){
             mMemory.remove(0);
         }
-        mEvents.send(buffer.array());
+
+        byte [] ret = buffer.array();
+        //Log.d("PingPong","tick send: id: 0x"+ ByteHelpers.ByteArrayToHexString(ret)+" len:"+ret.length);
+        mEvents.send(ret);
     }
 
     public boolean HandleIncoming(byte [] message) {
@@ -97,7 +105,11 @@ public class PingPong {
         byte [] incomingCounterBA = { message[4],message[5],message[6],message[7] };
 
         ByteBuffer wrapped = ByteBuffer.wrap(incomingCounterBA); // big-endian by default
+        wrapped.order(ByteOrder.BIG_ENDIAN);
+
         int incomingCounter = wrapped.getInt();
+
+        //Log.d("PingPong","handleIncoming: 0x"+ByteHelpers.ByteArrayToHexString(message)+" id: 0x"+ ByteHelpers.ByteArrayToHexString(incomingCounterBA)+"="+incomingCounter);
 
         for(idAndDataTime i : mMemory) {
 

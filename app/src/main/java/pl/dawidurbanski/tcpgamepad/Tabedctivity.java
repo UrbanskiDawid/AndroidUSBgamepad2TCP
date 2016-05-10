@@ -27,6 +27,7 @@ import android.widget.Toast;
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
 import pl.dawidurbanski.tcpgamepad.ADdrone.MessageRetransmissionLogic;
 import pl.dawidurbanski.tcpgamepad.Connection.ConnectionFragment;
+import pl.dawidurbanski.tcpgamepad.Connection.PingPong;
 import pl.dawidurbanski.tcpgamepad.Connection.TCPclient;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadFragment;
 import pl.dawidurbanski.tcpgamepad.GamePadHandler.GamePadInput;
@@ -55,6 +56,10 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
     private FloatingActionButton fab;
 
     private ImageView mSignal = null;
+
+    private PingPong mPingPong = null;
+    private int mPingPongInterval = 2000;
+    private long mConnectionPing = 9999;
 
     private MessageRetransmissionLogic mMessageRetransmissionLogic = null;
 
@@ -152,6 +157,23 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
         //handle messages
         mMessageRetransmissionLogic = new MessageRetransmissionLogic(this);
         //---
+
+        //ping pong
+        mPingPong = new PingPong(mPingPongInterval, new PingPong.OnEvent() {
+            @Override
+            public void send(byte[] msg) {
+                if(!mSectionsPagerAdapter.mConnectionFragment.isConnected())
+                    return;
+                mSectionsPagerAdapter.mConnectionFragment.sendBytes(msg);
+            }
+
+            @Override
+            public void onResponse(long deltaMS) {
+                Log2List("pingPong: "+deltaMS+"ms");
+                mConnectionPing=deltaMS;
+            }
+        });
+        //--
     }
 
     @Override
@@ -406,6 +428,15 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
                 @Override
                 public void messageReceived(byte[] message) {
                     Log2List("incoming: 0x"+Message.toHexString(message));
+                }
+            };
+
+            mConnectionFragment.onNewPong = new TCPclient.OnMessageReceived() {
+                @Override
+                public void messageReceived(byte[] message) {
+                    if(!mPingPong.HandleIncoming(message)){
+                        Log2List("Tabedctivity: pingPong error pong: 0x"+Message.toHexString(message)+" len: "+message.length);
+                    }
                 }
             };
         }

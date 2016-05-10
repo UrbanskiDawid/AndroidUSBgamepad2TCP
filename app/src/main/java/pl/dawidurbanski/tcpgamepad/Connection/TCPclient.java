@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import pl.dawidurbanski.tcpgamepad.ByteHelpers;
+
 /**
  * Created by Dawid on 23.01.2016.
  */
@@ -75,6 +77,13 @@ public class TCPclient {
         mBufferOut = null;
     }
 
+    private void messageReceived(byte []buffer,int len){
+        byte [] b2 = new byte[len];
+        for(int i=0;i<len;i++){b2[i]=buffer[i];}
+        //Log.w("TCPclient","recived "+len+"bytes: 0x"+ByteHelpers.ByteArrayToHexString(b2));
+        mMessageListener.messageReceived(b2); //call the method messageReceived from MyActivity class
+    }
+
     String errorMgs="";
     public boolean run(String adress,int port) {
 
@@ -114,7 +123,7 @@ public class TCPclient {
                 {
                     numOfBytes = mDataInputStream.read(buffer);
                     if(numOfBytes>0 && mMessageListener != null) {
-                        mMessageListener.messageReceived(buffer); //call the method messageReceived from MyActivity class
+                        messageReceived(buffer,numOfBytes);
                     }
                 }
 

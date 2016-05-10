@@ -42,14 +42,14 @@ public class Message {
      command
      * MANUAL (=1000) - normalna praca, skutek kontroler będzie realizował zadane wartości katów i przepustnicy zgodnie z ControlData
      * STOP (=2000) - skutek: bezwzględne zatrzymanie (natychmiastowe wyłączenie silników bez wzgledu na stan)
-     * ERROR_CONNECTION (=6100) - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze coś się stało złego z komunikacją)
-     * ERROR_NOINPUT (=??), - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze nie ma wiecej poleceń sterowania
+     * ERROR_JOYSTICK (=6100) - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze coś się stało złego z komunikacją)
+     * ERROR_NOINPUT (=6200), - wtedy kiedy chcemy "powiedzieć" kontrolerowi, ze nie ma wiecej poleceń sterowania
      */
     public enum Command {
         MANUAL(1000),
         STOP(2000),
-        ERROR_NOINPUT(6100),//TODO: missing value (current=ERROR_CONNECTION)
-        ERROR_CONNECTION(6100);
+        ERROR_NOINPUT(6100),//TODO: missing value (current=ERROR_JOYSTICK)
+        ERROR_JOYSTICK(6200);
 
         private final int value;
         Command(int value) {

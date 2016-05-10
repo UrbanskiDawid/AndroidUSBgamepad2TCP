@@ -158,7 +158,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
         mMessageRetransmissionLogic = new MessageRetransmissionLogic(this);
         //---
 
-        //ping pong
+        //pingPong
         mPingPong = new PingPong(mPingPongInterval, new PingPong.OnEvent() {
             @Override
             public void send(byte[] msg) {

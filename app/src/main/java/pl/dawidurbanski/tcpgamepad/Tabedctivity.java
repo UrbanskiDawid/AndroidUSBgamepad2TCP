@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import pl.dawidurbanski.tcpgamepad.ADdrone.Message;
@@ -56,10 +57,10 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
     private FloatingActionButton fab;
 
     private ImageView mSignal = null;
+    private TextView mSignalQualityText = null;
 
     private PingPong mPingPong = null;
     private int mPingPongInterval = 2000;
-    private long mConnectionPing = 9999;
 
     private MessageRetransmissionLogic mMessageRetransmissionLogic = null;
 
@@ -153,6 +154,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
         //--
 
         mSignal = (ImageView)findViewById(R.id.signal);
+        mSignalQualityText = (TextView)findViewById(R.id.qualityText);
 
         //handle messages
         mMessageRetransmissionLogic = new MessageRetransmissionLogic(this);
@@ -170,7 +172,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
             @Override
             public void onResponse(long deltaMS) {
                 Log2List("pingPong: "+deltaMS+"ms");
-                mConnectionPing=deltaMS;
+                updateConnectionQuality(deltaMS);
             }
         });
         //--
@@ -257,10 +259,31 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
 
         runOnUiThread(new Runnable() {
             public void run() {
-                fab.setImageDrawable( getResources().getDrawable(DrawableID, getBaseContext().getTheme()) );
-                mSignal.setImageDrawable( getResources().getDrawable(DrawableID_signal, getBaseContext().getTheme()) );
+                fab.setImageResource(DrawableID);
+                mSignal.setImageResource(DrawableID_signal);
+                mSignalQualityText.setText("");
             }
         });
+    }
+
+    private void updateConnectionQuality(final long ping)
+    {
+        if(!mSectionsPagerAdapter.mConnectionFragment.isConnected())
+            return;
+
+             if (ping < 20)  DrawableID_signal = R.drawable.ic_signal_cellular_4_bar_black_24dp;
+        else if (ping < 60)  DrawableID_signal = R.drawable.ic_signal_cellular_3_bar_black_24dp;
+        else if (ping < 100) DrawableID_signal = R.drawable.ic_signal_cellular_2_bar_black_24dp;
+        else if (ping < 150) DrawableID_signal = R.drawable.ic_signal_cellular_1_bar_black_24dp;
+        else                 DrawableID_signal = R.drawable.ic_signal_cellular_0_bar_black_24dp;
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                mSignal.setImageResource(DrawableID_signal);
+                mSignalQualityText.setText(ping+"ms");
+            }
+        });
+
     }
 
     /**

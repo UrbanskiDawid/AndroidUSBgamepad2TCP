@@ -1,11 +1,16 @@
 package pl.dawidurbanski.tcpgamepad.VirtualGamePad;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,44 +19,65 @@ import android.view.View;
  */
 public class VirtualGamePadKnobView extends View {
 
-    private Paint mPaint = new Paint();
+    private Paint
+      mBlackPaint = new Paint(),
+      mBGPaint = new Paint(),
+      mShadowPaing = new Paint();
 
     private Rect mRect = new Rect();
 
-    private KnobPosition knobPos = new KnobPosition();
+    private Knob knob = new Knob();
+
+    Drawable mKnobImage;
 
     public interface OnEvent { void onMove(float x,float y); }
     public OnEvent onMove = null;
 
     public VirtualGamePadKnobView(Context context) {
         super(context);
-        mPaint.setColor(Color.BLACK);
     }
 
-    public void disableKnoxXReset()  { knobPos.resettableX=false; }
-    public void disableKnobYReset()  { knobPos.resettableY=false; }
+    public VirtualGamePadKnobView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
+    public void disableKnoxXReset()  { knob.resettableX=false; }
+    public void disableKnobYReset()  { knob.resettableY=false; }
+
+    int BGcolor = 0;
     public void init() {
+
+        mBlackPaint.setColor(Color.BLACK);
+        mShadowPaing.setColor(Color.argb(100,0,0,0));
+
+
+        BGcolor = Color.TRANSPARENT;
+        Drawable background = getBackground();
+        if (background instanceof ColorDrawable)
+            BGcolor= ((ColorDrawable) background).getColor();
+        mBGPaint.setColor(BGcolor);
+
+
+        // Specify the path (relative to the 'assets' folder)
+        Resources res = getResources();
+        mKnobImage = res.getDrawable(android.support.design.R.drawable.abc_btn_radio_to_on_mtrl_000);
+        Log.e("aa",mKnobImage.toString());
 
         // Set up the user interaction to manually show or hide the system UI.
         setOnTouchListener(new View.OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                getDrawingRect(mRect);
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                     case MotionEvent.ACTION_MOVE:
 
-                        float x = 2.0f * (-0.5f + (event.getX() - mRect.left) / mRect.right);
-                        float y = 2.0f * (-0.5f + (event.getY() + mRect.top) / mRect.bottom);
-
-                        knobPos.set(x, y, event.getSize());
+                        knob.set(event.getX(), event.getY(), event.getSize());
                         onNewPosition();
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        knobPos.reset();
+                        knob.reset();
                         onNewPosition();
                         break;
                 }
@@ -62,25 +88,62 @@ public class VirtualGamePadKnobView extends View {
 
     private void onNewPosition()  {
         invalidate();
-        if(onMove!=null) onMove.onMove(knobPos.xPos,knobPos.yPos);
+        if(onMove!=null) {
+            onMove.onMove(
+              knob.getX(),
+              knob.getY());
+        }
     }
 
-    private class KnobPosition  {
+    public enum HelperLinesStyle {  FALLOW,CENTER,NONE  }
+
+    private class Knob {
         boolean resettableX =true;
         boolean resettableY =true;
 
-        float xPos=0;//-1.0f - 0.0f +1.0f
-        float yPos=0;//-1.0f - 0.0f +1.0f
-        float radius=0;
+        private float xPos=0;//-1.0f - 0.0f
+        private float yPos=0;//-1.0f - 0.0f
 
-        public void KnobPosition(boolean x,boolean y) {
-            resettableX=x;
-            resettableX=y;
+        float radius=0;//not in uze
+
+        private Paint
+                mPaintA = new Paint(),
+                mPaintB = new Paint();
+        private float sizePx = 25;
+
+        private float deadZoneMin = 0.1f, deadZoneMax = 0.9f;
+
+        private HelperLinesStyle helperLines = HelperLinesStyle.NONE;
+
+        public Knob(){
+            setColor(Color.GRAY);
+            init();
         }
 
-        public void set(float x,float y,float size) {
-            xPos=x;
-            yPos=y;
+        private void setColor(int color){
+            mPaintA.setColor(color);
+            mPaintA.setStyle(Paint.Style.FILL);
+
+            mPaintB.setColor(Color.argb(100,100,0,0));
+            mPaintB.setStyle(Paint.Style.FILL);
+        }
+
+        public float getX() { return xPos; }
+        public float getY() { return xPos; }
+
+        private float calculatePos(float posPx, int minPx, int maxPx) {
+
+            float x = 2.0f * (-0.5f + (posPx - minPx) / maxPx);
+
+            float abs = Math.abs(x);
+            if(abs> deadZoneMax) return deadZoneMax*Math.signum(x);
+            if(abs< deadZoneMin) return 0.0f;
+            return x;
+        }
+
+        public void set(float X,float Y,float size) {
+            xPos= calculatePos(X,mRect.left,mRect.right);
+            yPos= calculatePos(Y,mRect.top,mRect.bottom);
             radius=size;
         }
 
@@ -89,39 +152,69 @@ public class VirtualGamePadKnobView extends View {
             if(resettableY) yPos = 0.0f;
         }
 
-        public void draw(Canvas canvas) {
-            float w2 = canvas.getWidth()/2;
-            float h2 = canvas.getHeight()/2;
+        private float w2=100.0f,h2=100.0f;
+        public void resize() {
+            w2=mRect.width()/2.0f;
+            h2=mRect.height()/2.0f;
+        }
+
+        public void draw(Canvas canvas,int width,int height) {
+
+            resize();
 
             float centerX =w2+xPos*w2;
             float centerY =h2+yPos*h2;
 
-            for(int i=0;i<50;i+=10)
-                canvas.drawCircle(
-                    centerX,
-                    centerY,
-                    radius+i,mPaint);
+            canvas.drawCircle(centerX,centerY,sizePx,      mPaintB);
+            canvas.drawCircle(centerX,centerY,sizePx*0.8f, mPaintA);
+
+            switch(helperLines){
+                case CENTER:
+                    canvas.drawLine(0, 0, width, height, mBlackPaint);
+                    canvas.drawLine(width, 0, 0, height, mBlackPaint);
+                break;
+                case FALLOW:
+                    canvas.drawLine(0, 0,   centerX, centerY, mBlackPaint);
+                    canvas.drawLine(width,0, centerX, centerY, mBlackPaint);
+                    canvas.drawLine(0, height,   centerX, centerY, mBlackPaint);
+                    canvas.drawLine(width,height, centerX, centerY, mBlackPaint);
+                break;
+                case NONE:
+                break;
+            }
+
+            //mKnobImage.setBounds((int)(centerX- sizePx),(int)(centerY- sizePx),(int)(centerX+ sizePx),(int)(centerY+ sizePx));//left, top, right, bottom);
+            //mKnobImage.draw(canvas);
         }
     }
 
-    public float getXpos() {   return knobPos.xPos;   }
-    public float getYpos() {   return knobPos.yPos;   }
-
-    public VirtualGamePadKnobView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+    public float getXpos() {   return knob.xPos;   }
+    public float getYpos() {   return knob.yPos;   }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
-        int w = canvas.getWidth();
-        int h = canvas.getHeight();
+        getDrawingRect(mRect);
 
-        //X
-        canvas.drawLine(0, 0, w, h, mPaint);
-        canvas.drawLine(w, 0, 0, h, mPaint);
+        int h = mRect.height(),
+            w = mRect.width();
 
-        //Line from center
-        knobPos.draw(canvas);
+        float deadZoneProc = 5.0f;
+
+        int dzX = (int)(mRect.width()*deadZoneProc/100.0f),
+            dzY = (int)(mRect.width()*deadZoneProc/100.0f);
+
+        canvas.drawRect(0,0,w,h, mShadowPaing);
+
+        //Active part
+        canvas.drawRoundRect(new RectF(dzX,dzY,w-dzX,h-dzY), dzX,dzY, mBGPaint);
+
+        //CENTER - deadZone
+        canvas.drawRoundRect(new RectF(
+                              w/2-dzX,h/2-dzY,
+                              w/2+dzX,h/2+dzY), dzX,dzY, mShadowPaing);
+
+        //Knob
+        knob.draw(canvas,w,h);
     }
 }

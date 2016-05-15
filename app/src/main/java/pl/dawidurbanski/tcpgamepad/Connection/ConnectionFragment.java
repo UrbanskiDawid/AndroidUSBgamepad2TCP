@@ -62,6 +62,7 @@ public class ConnectionFragment extends Fragment {
         unknown,
         disconnected,
         error,//only connecting cant change this state
+        connected_waitingFor1Message,//connection done but no message has arrived
         connecting,
         connected
     }
@@ -252,7 +253,7 @@ public class ConnectionFragment extends Fragment {
             @Override
             public void run(String str) {
                 Log("connected!");
-                updateConnectionStatus(ConnectionStatus.connected);
+                updateConnectionStatus(ConnectionStatus.connected_waitingFor1Message);
             }
         };
         mTCPconnectionTask.onEnd=new TCPconnectionTask.OnEvent() {
@@ -282,6 +283,10 @@ public class ConnectionFragment extends Fragment {
     }
 
     private void getBytes(byte[] in) {
+
+        if(mConnectionStatus==ConnectionStatus.connected_waitingFor1Message){
+            updateConnectionStatus(ConnectionStatus.connected);
+        }
         if(in.length<4) return;
 
         if (in.length == DebugData.messageLen) {

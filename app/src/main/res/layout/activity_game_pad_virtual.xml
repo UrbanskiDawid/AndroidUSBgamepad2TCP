@@ -1,5 +1,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:customNS="http://schemas.android.com/apk/res-auto"
     android:background="#e240ff"
     android:orientation="vertical"
     android:layout_width="wrap_content"
@@ -10,13 +11,19 @@
         android:background="@color/colorPrimary"
         android:layout_weight="1"
         android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        customNS:xAxisTitle="throtle"
+        customNS:yAxisTitle="roll"
+        customNS:knobColor="#ff4069"/>
 
     <pl.dawidurbanski.tcpgamepad.VirtualGamePad.VirtualGamePadKnobView
         android:id="@+id/fullscreen_contentR"
         android:background="@color/colorPrimaryDark"
         android:layout_weight="1"
         android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        customNS:xAxisTitle="pitch"
+        customNS:yAxisTitle="yaw"
+        customNS:knobColor="#6dff40"/>
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package pl.dawidurbanski.tcpgamepad.VirtualGamePad;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,9 +11,10 @@ import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import pl.dawidurbanski.tcpgamepad.R;
 
 /**
  * Created by dawid on 30.01.2016.
@@ -22,12 +24,15 @@ public class VirtualGamePadKnobView extends View {
     private Paint
       mBlackPaint = new Paint(),
       mBGPaint = new Paint(),
-      mShadowPaing = new Paint();
+      mShadowPaing = new Paint(),
+      textPaint = new Paint();
 
     private Rect mRect = new Rect();
 
     private Knob knob = new Knob();
 
+    private String mxAxisTitle="";
+    private String myAxisTitle="";
     Drawable mKnobImage;
 
     public interface OnEvent { void onMove(float x,float y); }
@@ -39,19 +44,34 @@ public class VirtualGamePadKnobView extends View {
 
     public VirtualGamePadKnobView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.VirtualGamePadKnob,0,0);
+
+        int knobColor=Color.BLACK;
+        try {
+            mxAxisTitle = ta.getString(R.styleable.VirtualGamePadKnob_xAxisTitle);
+            myAxisTitle = ta.getString(R.styleable.VirtualGamePadKnob_yAxisTitle);
+            knobColor   = ta.getColor(R.styleable.VirtualGamePadKnob_knobColor,Color.GRAY);
+        } finally {
+            ta.recycle();
+        }
+        knob.setColor(knobColor);
     }
 
     public void disableKnoxXReset()  { knob.resettableX=false; }
     public void disableKnobYReset()  { knob.resettableY=false; }
 
-    int BGcolor = 0;
     public void init() {
+
+        textPaint.setARGB(200, 254, 0, 0);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(24);
 
         mBlackPaint.setColor(Color.BLACK);
         mShadowPaing.setColor(Color.argb(100,0,0,0));
 
 
-        BGcolor = Color.TRANSPARENT;
+        int BGcolor = Color.TRANSPARENT;
         Drawable background = getBackground();
         if (background instanceof ColorDrawable)
             BGcolor= ((ColorDrawable) background).getColor();
@@ -61,7 +81,6 @@ public class VirtualGamePadKnobView extends View {
         // Specify the path (relative to the 'assets' folder)
         Resources res = getResources();
         mKnobImage = res.getDrawable(android.support.design.R.drawable.abc_btn_radio_to_on_mtrl_000);
-        Log.e("aa",mKnobImage.toString());
 
         // Set up the user interaction to manually show or hide the system UI.
         setOnTouchListener(new View.OnTouchListener() {
@@ -85,6 +104,7 @@ public class VirtualGamePadKnobView extends View {
             }
         });
     }
+
 
     private void onNewPosition()  {
         invalidate();
@@ -114,11 +134,6 @@ public class VirtualGamePadKnobView extends View {
         private float deadZoneMin = 0.1f, deadZoneMax = 0.9f;
 
         private HelperLinesStyle helperLines = HelperLinesStyle.NONE;
-
-        public Knob(){
-            setColor(Color.GRAY);
-            init();
-        }
 
         private void setColor(int color){
             mPaintA.setColor(color);
@@ -182,9 +197,6 @@ public class VirtualGamePadKnobView extends View {
                 case NONE:
                 break;
             }
-
-            //mKnobImage.setBounds((int)(centerX- sizePx),(int)(centerY- sizePx),(int)(centerX+ sizePx),(int)(centerY+ sizePx));//left, top, right, bottom);
-            //mKnobImage.draw(canvas);
         }
     }
 
@@ -213,6 +225,18 @@ public class VirtualGamePadKnobView extends View {
         canvas.drawRoundRect(new RectF(
                               w/2-dzX,h/2-dzY,
                               w/2+dzX,h/2+dzY), dzX,dzY, mShadowPaing);
+
+        canvas.drawText(myAxisTitle,
+                (canvas.getWidth() / 2),
+                (int) (dzY*2 - ((textPaint.descent() + textPaint.ascent()) / 2)),
+                textPaint);
+
+        canvas.save();
+        canvas.rotate(90.0f, 0, 0);
+        canvas.drawText(mxAxisTitle,
+                (canvas.getHeight() / 2),
+                -dzY*2, textPaint);
+        canvas.restore();
 
         //Knob
         knob.draw(canvas,w,h);

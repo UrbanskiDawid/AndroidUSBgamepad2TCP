@@ -7,8 +7,8 @@ android {
         applicationId 'pl.dawidurbanski.androidUSBgamepad2TCP'
         minSdkVersion 19
         targetSdkVersion 19
-        versionName '4'
-        versionCode 4
+        versionName '5'
+        versionCode 5
     }
     buildTypes {
         release {

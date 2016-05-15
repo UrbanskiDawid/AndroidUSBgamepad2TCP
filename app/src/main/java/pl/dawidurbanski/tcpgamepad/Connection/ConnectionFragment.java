@@ -3,7 +3,6 @@ package pl.dawidurbanski.tcpgamepad.Connection;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
 import pl.dawidurbanski.tcpgamepad.ByteHelpers;
 import pl.dawidurbanski.tcpgamepad.ADdrone.DebugData;
 import pl.dawidurbanski.tcpgamepad.R;
@@ -51,7 +51,7 @@ public class ConnectionFragment extends Fragment {
                    onSave=null;
 
     public TCPclient.OnMessageReceived
-            onNewMessage=null,
+            onNewDebugData=null,
             onNewPong=null;
 
     public interface OnConnectionStatusEvent { void change(ConnectionStatus newStatus);   }
@@ -193,7 +193,8 @@ public class ConnectionFragment extends Fragment {
 
     private void readIncomingBytes(byte[] in){
 
-        //Log.d("ConnectionF","in: 0x"+ByteHelpers.ByteArrayToHexString(in));
+        //Log.w("ConnectionFragment","readIncomingBytes: 0x"+ByteHelpers.ByteArrayToHexString(in));
+
         ArrayList<Byte> incomingBytes = new ArrayList<>();
         int readAhead=0;
         for(byte b:in) {
@@ -284,7 +285,7 @@ public class ConnectionFragment extends Fragment {
         if(in.length<4) return;
 
         if (in.length == DebugData.messageLen) {
-            if(onNewMessage!=null) onNewMessage.messageReceived(in);
+            if(onNewDebugData !=null) onNewDebugData.messageReceived(in);
             return;
         }
 

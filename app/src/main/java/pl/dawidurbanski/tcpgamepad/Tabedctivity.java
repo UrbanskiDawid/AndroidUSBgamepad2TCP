@@ -171,7 +171,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
 
             @Override
             public void onResponse(long deltaMS) {
-                Log2List("pingPong: "+deltaMS+"ms");
+                Log2List("TabeAdtivity pingPong: "+deltaMS+"ms");
                 updateConnectionQuality(deltaMS);
             }
         });
@@ -447,10 +447,10 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
                 }
             };
 
-            mConnectionFragment.onNewMessage = new TCPclient.OnMessageReceived() {
+            mConnectionFragment.onNewDebugData = new TCPclient.OnMessageReceived() {
                 @Override
                 public void messageReceived(byte[] message) {
-                    Log2List("incoming: 0x"+Message.toHexString(message));
+                    Log2List("Tabedctivity: debugData: 0x"+Message.toHexString(message));
                 }
             };
 
@@ -459,6 +459,8 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
                 public void messageReceived(byte[] message) {
                     if(!mPingPong.HandleIncoming(message)){
                         Log2List("Tabedctivity: pingPong error pong: 0x"+Message.toHexString(message)+" len: "+message.length);
+                    }else{
+                        //Log2List("Tabedctivity: pong 0x"+Message.toHexString(message));
                     }
                 }
             };

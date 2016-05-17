@@ -1,6 +1,7 @@
 package pl.dawidurbanski.tcpgamepad;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
@@ -280,7 +282,7 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
         runOnUiThread(new Runnable() {
             public void run() {
                 mSignal.setImageResource(DrawableID_signal);
-                mSignalQualityText.setText(ping+"ms");
+                mSignalQualityText.setText(ping + "ms, " + getNetworkInfo());
             }
         });
 
@@ -388,6 +390,38 @@ public class Tabedctivity extends AppCompatActivity implements Message.OnNewInpu
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             mTabLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String getNetworkInfo() {
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager != null) {
+            int networkType = telephonyManager.getNetworkType();
+            switch (networkType) {
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                case TelephonyManager.NETWORK_TYPE_IDEN:
+                    return "2G";
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                case TelephonyManager.NETWORK_TYPE_EHRPD:
+                case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    return "3G";
+                case TelephonyManager.NETWORK_TYPE_LTE:
+                    return "4G";
+                default:
+                    return "Unknown";
+            }
+        }
+        else {
+            return "Unknown";
         }
     }
 
